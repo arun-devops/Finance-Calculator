@@ -1,4 +1,4 @@
-/* Minimal, clean styling without external dependencies */
+
 :root{
   --bg: #0b1220;
   --card: #121a2b;
@@ -13,6 +13,7 @@
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;}
 
+.theme-toggle{position:fixed;top:10px;right:10px;background:#444;color:#fff;padding:6px 10px;border-radius:8px;cursor:pointer;z-index:10;}
 .app-header{padding:20px;border-bottom:1px solid #22304d;background:linear-gradient(180deg,#0c172c,#0b1220);position:sticky;top:0;z-index:2}
 .title{font-size:24px;font-weight:700}
 .subtitle{font-size:12px;color:var(--muted);margin-top:6px}
@@ -23,93 +24,62 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:
 .sidebar a:hover{background:#0f1524;border-color:#273759}
 
 .content{flex:1;display:flex;flex-direction:column;gap:16px}
-
 .card{background:var(--card);border:1px solid #1e2a44;border-radius:16px;padding:16px}
 .card h2{margin:0 0 8px}
 .desc{color:var(--muted);margin:4px 0 12px;}
-
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:10px}
 label{display:flex;flex-direction:column;font-size:12px;color:#b8caef;gap:6px}
 input,select{background:#0b1324;border:1px solid #22304d;border-radius:12px;color:#e8f0ff;padding:10px;font-size:14px;outline:none}
 input:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(91,157,249,0.15)}
-
 .btn{background:var(--acc);color:#00102a;border:0;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
 .btn:hover{filter:brightness(1.08)}
-
 .result{margin-top:10px;padding:12px;background:#0e1628;border:1px solid #243454;border-radius:12px}
 .kpi{display:flex;flex-wrap:wrap;gap:14px;margin:8px 0 0}
 .kpi div{background:#0b1324;border:1px solid #22304d;padding:10px 12px;border-radius:12px;min-width:180px}
 .kpi .v{font-size:18px;font-weight:800}
 .kpi .l{font-size:11px;color:#a8b6d8;margin-top:4px;display:block}
-
 .table-wrap{overflow:auto;max-height:420px;border:1px solid #243454;border-radius:12px;margin-top:12px}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:8px 10px;border-bottom:1px solid #203052;text-align:right}
+th,td{padding:8px 10px;border-bottom:1px solid #203052;text-align:right;color:#e8f0ff}
 th{text-align:right;color:#a9b9db;position:sticky;top:0;background:#0e1628}
 td:first-child,th:first-child{text-align:left}
-.footer{opacity:.7;font-size:12px;text-align:center;padding:24px 8px}
+.footer{opacity:.8;font-size:12px;text-align:center;padding:24px 8px}
 
-.warning{background:#3a1d1d;color:#ffb3b3;border:1px solid #e74c3c;padding:8px;border-radius:8px;margin-top:8px;}
-.theme-toggle{position:fixed;top:10px;right:10px;background:#444;color:#fff;padding:6px 10px;border-radius:8px;cursor:pointer;z-index:10;}
+/* Light theme */
 .light{
   --bg:#f5f7fb;
   --card:#ffffff;
   --text:#0d1b2a;
-  --muted:#495057;
+  --muted:#475569;
   --acc:#0d6efd;
 }
-.light input,.light select{
-  background:#fff;
-  color:#0d1b2a;
-  border:1px solid #ced4da;
-}
-.light .btn{
-  background:var(--acc);
-  color:#fff;
-}
-.light .sidebar{
-  background:#f8f9fa;
-  border:1px solid #dee2e6;
-}
-.light .card{
-  background:#ffffff;
-  border:1px solid #dee2e6;
-}
-.light .result{
-  background:#f1f3f5;
-  border:1px solid #dee2e6;
-  color:#212529;
-}
-
-
-.light .kpi div{
-  background:#ffffff;
-  border:1px solid #dee2e6;
-  color:#0d1b2a;
-}
-
-
-/* Light theme readability fixes */
-.light .sidebar a{color:#0d1b2a;border-color:#e5e7eb}
+.light .app-header{background:#ffffff;border-bottom:1px solid #dee2e6;}
+.light .title{color:#0d1b2a}
+.light .subtitle{color:#475569}
+.light input,.light select{background:#fff;color:#0d1b2a;border:1px solid #ced4da}
+.light .btn{background:var(--acc);color:#fff}
+.light .sidebar{background:#f8f9fa;border:1px solid #dee2e6}
+.light .sidebar a{color:#0d1b2a}
 .light .sidebar a:hover{background:#e9ecef;border-color:#ced4da}
-.light label{color:#334155} /* darker label text */
-.light .desc{color:#475569}
-.light .subtitle{color:#52606d}
-.light nav a{color:#0d1b2a}
-.light th, .light td{color:#0d1b2a}
+.light .card{background:#ffffff;border:1px solid #dee2e6}
+.light .result{background:#f1f3f5;border:1px solid #dee2e6;color:#212529}
+.light .kpi div{background:#ffffff;border:1px solid #dee2e6;color:#0d1b2a}
+.light .kpi .l{color:#475569}
+.light .table-wrap{border-color:#dee2e6}
+.light th{background:#f1f3f5 !important;color:#0d1b2a !important;border-bottom:1px solid #ced4da}
+.light td{color:#0d1b2a}
+.warning{background:#fff3cd;color:#5f441a;border:1px solid #ffec99;padding:8px;border-radius:8px;margin-top:8px;}
 
-.light .app-header{
-  background:#ffffff;
-  border-bottom:1px solid #dee2e6;
-}
-.light .title{ color:#0d1b2a; }
-.light .subtitle{ color:#475569; }
+.desc strong{font-weight:700}
 
+.result:empty{display:none}
+.table-wrap:empty{display:none}
 
-/* Force table header visibility in light theme */
-.light th {
-  background:#f1f3f5 !important;
-  color:#0d1b2a !important;
-  font-weight:600;
-}
-.light thead{border-bottom:2px solid #dee2e6;}
+.payout{margin-top:12px;padding-top:10px;border-top:1px dashed #2a3a5a}
+.payout .phead{font-size:12px;opacity:.9;margin-bottom:8px}
+.payout .prow{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px}
+.payout .prow div{background:#0b1324;border:1px solid #22304d;border-radius:10px;padding:10px}
+.payout .v{display:block;font-weight:800;margin-top:6px}
+.payout .l{font-size:11px;color:#a8b6d8}
+.light .payout .prow div{background:#fff;border-color:#dee2e6}
+.light .payout .l{color:#475569}

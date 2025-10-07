@@ -1,10 +1,10 @@
-
 // ===== Helpers =====
+function fmtMoneyDec(x,d=2){ return "₹ " + Number(x).toLocaleString('en-IN',{minimumFractionDigits:d, maximumFractionDigits:d}); }
+function fmtLakh(x){ const v = Number(x)/100000; return "₹ " + v.toLocaleString('en-IN',{minimumFractionDigits:2, maximumFractionDigits:2}) + " Lacs"; }
 function fmtMoney(x){ return "₹ " + Math.round(Number(x)).toLocaleString("en-IN"); }
 function fmtPct(x){
   let v = Number(x);
   if (!isFinite(v)) v = 0;
-  // clamp tiny fp noise, round to 2 dp then strip trailing zeros
   v = Math.round((v + 1e-10)*100)/100;
   const whole = Math.round(v);
   return (Math.abs(v - whole) < 1e-6 ? whole : v.toLocaleString("en-IN", {maximumFractionDigits:2})) + " %";
@@ -34,6 +34,16 @@ function calcFD(){
       <div><span class="v">${fmtPct(r*100)}</span><span class="l">Annual Rate</span></div>
       <div><span class="v">${fmtMoney(A)}</span><span class="l">Maturity Amount</span></div>
       <div><span class="v">${fmtMoney(interest)}</span><span class="l">Total Interest</span></div>
+    </div>
+    <div class="payout">
+      <div class="phead">Interest Payout Guide (simple payout, not compounded)</div>
+      <div class="prow">
+        <div><span class="l">Monthly</span><span class="v">${fmtMoney(P * r/12)}</span></div>
+        <div><span class="l">Quarterly</span><span class="v">${fmtMoney(P * r/4)}</span></div>
+        <div><span class="l">Half-yearly</span><span class="v">${fmtMoney(P * r/2)}</span></div>
+        <div><span class="l">Yearly</span><span class="v">${fmtMoney(P * r)}</span></div>
+      </div>
+      <div class="pnote">These are approximate interest payouts if your bank pays out interest periodically instead of compounding it.</div>
     </div>`;
   const headers = ["Year","Start Balance","Interest","End Balance"];
   let rows = [], start=P;
@@ -42,7 +52,7 @@ function calcFD(){
     rows.push([y, fmtMoney(start), fmtMoney(end-start), fmtMoney(end)]);
     start = end;
   }
-  const t = document.getElementById('fd_schedule'); if(t) t.innerHTML = buildTable(headers, rows);
+  document.getElementById('fd_schedule').innerHTML = buildTable(headers, rows);
 }
 
 // ===== RD =====
@@ -51,13 +61,13 @@ function calcRD(){
   const r = clampNum(document.getElementById('rd_rate').value)/100;
   const months = Math.max(1, parseInt(document.getElementById('rd_months').value||"1",10));
   const im = Math.pow(1 + r/4, 1/3) - 1;
-  let maturity = 0, rows=[], bal=0;
+  let rows=[], bal=0;
   for(let k=1;k<=months;k++){
     bal = bal*(1+im) + R;
     const interest = (bal - R)/(1+im) * im;
     rows.push([k, fmtMoney(R), fmtMoney(interest), fmtMoney(bal)]);
   }
-  maturity = bal;
+  const maturity = bal;
   const totalDeposit = R * months;
   const interest = maturity - totalDeposit;
   document.getElementById('rd_result').innerHTML = `
@@ -67,7 +77,7 @@ function calcRD(){
       <div><span class="v">${fmtMoney(maturity)}</span><span class="l">Maturity Amount</span></div>
       <div><span class="v">${fmtMoney(interest)}</span><span class="l">Total Interest</span></div>
     </div>`;
-  const t = document.getElementById('rd_schedule'); if(t) t.innerHTML = buildTable(["Month","Deposit","Interest","End Balance"], rows);
+  document.getElementById('rd_schedule').innerHTML = buildTable(["Month","Deposit","Interest","End Balance"], rows);
 }
 
 // ===== SIP =====
@@ -76,8 +86,9 @@ function calcSIP(){
   const r = Math.pow(1 + clampNum(document.getElementById('sip_rate').value)/100, 1/12) - 1;
   const years = clampNum(document.getElementById('sip_years').value);
   const n = Math.round(years*12);
-  const timing = document.getElementById('sip_timing').value;
-  let fv, rows=[], bal=0;
+  const timingEl = document.getElementById('sip_timing');
+  const timing = timingEl ? timingEl.value : 'end';
+  let rows=[], bal=0;
   for(let m=1;m<=n;m++){
     if(timing==="start") bal += P;
     const before = bal;
@@ -86,16 +97,14 @@ function calcSIP(){
     if(timing==="end") bal += P;
     rows.push([m, fmtMoney(P), fmtMoney(interest), fmtMoney(bal)]);
   }
-  fv = bal;
-  const invested = P * n;
-  const gains = fv - invested;
+  const fv = bal, invested = P*n, gains=fv-invested;
   document.getElementById('sip_result').innerHTML = `
     <div class="kpi">
       <div><span class="v">${fmtMoney(invested)}</span><span class="l">Total Invested</span></div>
       <div><span class="v">${fmtMoney(fv)}</span><span class="l">Future Value</span></div>
       <div><span class="v">${fmtMoney(gains)}</span><span class="l">Estimated Gains</span></div>
     </div>`;
-  const t = document.getElementById('sip_schedule'); if(t) t.innerHTML = buildTable(["Month","Contribution","Interest","End Balance"], rows);
+  document.getElementById('sip_schedule').innerHTML = buildTable(["Month","Contribution","Interest","End Balance"], rows);
 }
 
 // ===== Lumpsum =====
@@ -116,7 +125,7 @@ function calcLumpsum(){
     const before=bal; bal = bal*Math.pow(1+i,12);
     rows.push([y, fmtMoney(bal-before), fmtMoney(bal)]);
   }
-  const t = document.getElementById('ls_schedule'); if(t) t.innerHTML = buildTable(["Year","Interest","End Balance"], rows);
+  document.getElementById('ls_schedule').innerHTML = buildTable(["Year","Interest","End Balance"], rows);
 }
 
 // ===== SWP =====
@@ -148,7 +157,7 @@ function calcSWP(){
       <div><span class="v">${yearsSurvived} yrs</span><span class="l">Sustainment (approx)</span></div>
     </div>`;
   if(depletedEarly){ showWarning("Corpus depleted before chosen tenure. Reduce withdrawal or tenure.", "swp_result"); }
-  const t = document.getElementById('swp_schedule'); if(t) t.innerHTML = buildTable(["Month","Start","Growth","Withdrawal","End"], rows);
+  document.getElementById('swp_schedule').innerHTML = buildTable(["Month","Start","Growth","Withdrawal","End"], rows);
 }
 
 // ===== EMI =====
@@ -216,7 +225,7 @@ function calcNPS(){
       <div><span class="v">${fmtMoney(annuityPurchase)}</span><span class="l">Annuity Purchase</span></div>
       <div><span class="v">${fmtMoney(estMonthlyPension)}</span><span class="l">Est. Monthly Pension</span></div>
     </div>`;
-  const t = document.getElementById('nps_schedule'); if(t) t.innerHTML = buildTable(["Year","Contribution","Interest","End Balance"], rows);
+  document.getElementById('nps_schedule').innerHTML = buildTable(["Year","Contribution","Interest","End Balance"], rows);
 }
 
 // ===== PPF =====
@@ -243,7 +252,7 @@ function calcPPF(){
       <div><span class="v">${fmtMoney(fv)}</span><span class="l">Estimated Maturity</span></div>
       <div><span class="v">${fmtMoney(gains)}</span><span class="l">Estimated Interest</span></div>
     </div>`;
-  const t = document.getElementById('ppf_schedule'); if(t) t.innerHTML = buildTable(["Year","Deposit","Interest","End Balance"], rows);
+  document.getElementById('ppf_schedule').innerHTML = buildTable(["Year","Deposit","Interest","End Balance"], rows);
 }
 
 // ===== CAGR =====
@@ -257,7 +266,7 @@ function calcCAGR(){
     <div class="kpi">
       <div><span class="v">${fmtPct(c*100)}</span><span class="l">CAGR</span></div>
     </div>`;
-  const t = document.getElementById('cagr_schedule'); if(t) t.innerHTML = buildTable(["Start","End","Years","CAGR"], [[fmtMoney(S), fmtMoney(E), n, fmtPct(c*100)]]);
+  document.getElementById('cagr_schedule').innerHTML = buildTable(["Start","End","Years","CAGR"], [[fmtMoney(S), fmtMoney(E), n, fmtPct(c*100)]]);
 }
 
 // ===== Inflation =====
@@ -272,27 +281,57 @@ function calcInflation(){
       <div><span class="v">${fmtPct(real*100)}</span><span class="l">Real Return (approx)</span></div>
       <div><span class="v">${fmtMoney(pv_today)}</span><span class="l">Future Value in Today's Money (1 year)</span></div>
     </div>`;
-  const t = document.getElementById('inflation_schedule'); if(t) t.innerHTML = buildTable(["Nominal %","Inflation %","Real %","FV in Today's ₹ (1y)"], [[fmtPct(nom*100), fmtPct(inf*100), fmtPct(real*100), fmtMoney(pv_today)]]);
+  document.getElementById('inflation_schedule').innerHTML = buildTable(["Nominal %","Inflation %","Real %","FV in Today's ₹ (1y)"], [[fmtPct(nom*100), fmtPct(inf*100), fmtPct(real*100), fmtMoney(pv_today)]]);
 }
 
 // ===== Goal SIP =====
+
+
 function calcGoal(){
   const target = clampNum(document.getElementById('goal_target').value);
-  const r = Math.pow(1 + clampNum(document.getElementById('goal_rate').value)/100, 1/12) - 1;
+  const annual = clampNum(document.getElementById('goal_rate').value)/100;
   const years = clampNum(document.getElementById('goal_years').value);
   const n = Math.round(years*12);
-  const timing = document.getElementById('goal_timing').value;
-  if(r===0){
-    const sip = target/n;
-    document.getElementById('goal_result').innerHTML = `<div class="kpi"><div><span class="v">${fmtMoney(sip)}</span><span class="l">Required Monthly SIP</span></div></div>`;
-    const t = document.getElementById('goal_schedule'); if(t) t.innerHTML = buildTable(["Target","Monthly Rate","Months","Timing","Required SIP"], [[fmtMoney(target), fmtPct(0), n, (timing==="start"?"Annuity Due":"Ordinary"), fmtMoney(sip)]]);
-    return;
+
+  // Indian convention: nominal monthly rate (annual ÷ 12), ordinary annuity (end of month)
+  const r = annual/12;
+
+  const factor = (Math.pow(1+r, n) - 1)/r; // ordinary (no extra (1+r))
+  const sip = target / factor;             // monthly SIP
+  const invested = sip * n;
+
+  // KPI (Monthly SIP with 2 decimals; Total Investment in Lacs)
+  const sipRounded = Math.round(sip);
+  document.getElementById('goal_result').innerHTML = `
+    <div class="kpi">
+      <div><span class="v">${fmtMoney(sipRounded)}</span><span class="l">Required Monthly SIP</span></div>
+      <div><span class="v">${fmtLakh(invested)}</span><span class="l">Your Total Investment</span></div>
+    </div>`;
+
+  // Build monthly schedule for transparency
+  let rows = [], bal = 0;
+  for(let m=1;m<=n;m++){
+    const before = bal;
+    bal = bal * (1+r) + sipRounded; // pay at end of month
+    const interest = before * r;
+    rows.push([m, fmtMoney(sipRounded), fmtMoneyDec(interest,2), fmtMoneyDec(bal,2)]);
   }
-  const factor = (Math.pow(1+r, n) - 1)/r * (timing==='start' ? (1+r) : 1);
-  const sip = target / factor;
-  document.getElementById('goal_result').innerHTML = `<div class="kpi"><div><span class="v">${fmtMoney(sip)}</span><span class="l">Required Monthly SIP</span></div></div>`;
-  const t = document.getElementById('goal_schedule'); if(t) t.innerHTML = buildTable(["Target","Monthly Rate","Months","Timing","Required SIP"], [[fmtMoney(target), fmtPct(r*1200), n, (timing==="start"?"Annuity Due":"Ordinary"), fmtMoney(sip)]]);
+
+  const summary = buildTable(
+    ["Target","Monthly rate (per month)","Months","Timing","Method","Required SIP","Total Invested"],
+    [[fmtMoney(target), fmtPct(r*100), n, "Ordinary (end of month)", "Nominal (p.a./12)", fmtMoney(sipRounded), fmtMoney(invested)]]
+  );
+  const schedule = buildTable(["Month","Contribution","Interest","End Balance"], rows);
+  const sc = document.getElementById('goal_schedule'); if(sc) sc.innerHTML = summary + schedule;
 }
 
-// ===== Theme Toggle =====
-function toggleTheme(){ document.body.classList.toggle("light"); }
+function toggleTheme(){ const isLight=document.body.classList.toggle('light'); try{localStorage.setItem('theme', isLight?'light':'dark');}catch(e){} }
+
+// APPLY_SAVED_THEME
+window.addEventListener('DOMContentLoaded', () => {
+  try{
+    const saved = localStorage.getItem('theme');
+    if(saved === 'light'){ document.body.classList.add('light'); }
+    else { document.body.classList.remove('light'); }
+  }catch(e){ /* ignore */ }
+}, { once: true });

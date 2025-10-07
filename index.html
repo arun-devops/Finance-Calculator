@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>India Finance Calculator Suite</title>
   <link rel="stylesheet" href="style.css"/>
-  <meta name="description" content="All-in-one Indian finance calculators: FD, RD, SIP, Lumpsum, SWP, EMI (Home/Personal/Car/Education), NPS, PPF, CAGR, Inflation, Goal SIP."/>
+  <meta name="description" content="Indian finance calculators: FD, RD, SIP, Lumpsum, SWP, EMI, NPS, PPF, CAGR, Inflation, Goal SIP."/>
 </head>
-<body><div class='theme-toggle' onclick='toggleTheme()'>🌓 Theme</div>
+<body>
+  <div class='theme-toggle' onclick='toggleTheme()'>🌓 Theme</div>
   <header class="app-header">
     <div class="title">🇮🇳 Finance Calculator Suite</div>
     <div class="subtitle">FD • RD • SIP • Lumpsum • SWP • EMI • NPS • PPF • CAGR • Inflation • Goal SIP</div>
@@ -31,13 +32,9 @@
     </aside>
 
     <main class="content">
-      <!-- FD -->
       <section id="fd" class="card">
         <h2>Fixed Deposit (FD) Calculator</h2>
-        <p class="desc">
-          Calculates maturity amount and interest for a fixed deposit. In India, banks typically compound quarterly.
-          Use the compounding selector if your bank specifies a different frequency.
-        </p>
+        <p class="desc">Quarterly compounding typical in India; choose compounding if different.</p>
         <div class="grid">
           <label>Principal (₹)<input type="number" id="fd_principal" value="100000" min="0"></label>
           <label>Annual Interest Rate (% p.a.)<input type="number" id="fd_rate" value="7" step="0.01" min="0"></label>
@@ -53,17 +50,12 @@
         </div>
         <button class="btn" onclick="calcFD()">Calculate</button>
         <div id="fd_result" class="result"></div>
-      
         <div id="fd_schedule" class="table-wrap"></div>
       </section>
 
-      <!-- RD -->
       <section id="rd" class="card">
         <h2>Recurring Deposit (RD) Calculator</h2>
-        <p class="desc">
-          Estimates maturity for monthly deposits. Indian RDs are usually compounded quarterly. We use an equivalent
-          monthly rate derived from quarterly compounding to simulate month-by-month growth.
-        </p>
+        <p class="desc">RDs are credited quarterly; we use an equivalent monthly rate from quarterly compounding.</p>
         <div class="grid">
           <label>Monthly Deposit (₹)<input type="number" id="rd_monthly" value="5000" min="0"></label>
           <label>Annual Interest Rate (% p.a.)<input type="number" id="rd_rate" value="7" step="0.01" min="0"></label>
@@ -71,38 +63,25 @@
         </div>
         <button class="btn" onclick="calcRD()">Calculate</button>
         <div id="rd_result" class="result"></div>
-      
         <div id="rd_schedule" class="table-wrap"></div>
       </section>
 
-      <!-- SIP -->
       <section id="sip" class="card">
         <h2>SIP (Systematic Investment Plan)</h2>
-        <p class="desc">
-          Computes future value of a monthly mutual fund investment. Choose payment timing:
-          end (ordinary annuity) or start (annuity due) of month.
-        </p>
+        <p class="desc">Monthly investment with effective monthly compounding. Choose payment timing.</p>
         <div class="grid">
           <label>Monthly SIP (₹)<input type="number" id="sip_amount" value="10000" min="0"></label>
           <label>Expected Return (% p.a.)<input type="number" id="sip_rate" value="12" step="0.01" min="0"></label>
           <label>Tenure (years)<input type="number" id="sip_years" value="10" step="0.5" min="0.5"></label>
-          <label>Payment Timing
-            <select id="sip_timing">
-              <option value="end" selected>End of month</option>
-              <option value="start">Start of month</option>
-            </select>
-          </label>
-        </div>
+          </div>
         <button class="btn" onclick="calcSIP()">Calculate</button>
         <div id="sip_result" class="result"></div>
-      
         <div id="sip_schedule" class="table-wrap"></div>
       </section>
 
-      <!-- Lumpsum -->
       <section id="lumpsum" class="card">
         <h2>Lumpsum Investment</h2>
-        <p class="desc">Future value of a one-time investment at an expected annual return, compounded monthly.</p>
+        <p class="desc">One-time investment compounded monthly from annual return.</p>
         <div class="grid">
           <label>Investment (₹)<input type="number" id="ls_amount" value="200000" min="0"></label>
           <label>Expected Return (% p.a.)<input type="number" id="ls_rate" value="12" step="0.01" min="0"></label>
@@ -110,16 +89,12 @@
         </div>
         <button class="btn" onclick="calcLumpsum()">Calculate</button>
         <div id="ls_result" class="result"></div>
-      
         <div id="ls_schedule" class="table-wrap"></div>
       </section>
 
-      <!-- SWP -->
       <section id="swp" class="card">
         <h2>SWP (Systematic Withdrawal Plan)</h2>
-        <p class="desc">
-          Simulates withdrawals from a starting corpus with monthly compounding. Useful for retirement income planning.
-        </p>
+        <p class="desc">Monthly growth, then withdrawal (end of month).</p>
         <div class="grid">
           <label>Starting Corpus (₹)<input type="number" id="swp_corpus" value="2000000" min="0"></label>
           <label>Monthly Withdrawal (₹)<input type="number" id="swp_withdraw" value="20000" min="0"></label>
@@ -128,16 +103,12 @@
         </div>
         <button class="btn" onclick="calcSWP()">Calculate</button>
         <div id="swp_result" class="result"></div>
-      
         <div id="swp_schedule" class="table-wrap"></div>
       </section>
 
-      <!-- EMI -->
       <section id="emi" class="card">
         <h2>Loan EMI (Home / Personal / Car / Education)</h2>
-        <p class="desc">
-          Calculates monthly EMI, total interest, and generates an amortization schedule. Works for any installment loan.
-        </p>
+        <p class="desc">Standard EMI formula with amortization table.</p>
         <div class="grid">
           <label>Loan Amount (₹)<input type="number" id="emi_principal" value="3000000" min="0"></label>
           <label>Annual Interest Rate (% p.a.)<input type="number" id="emi_rate" value="8.5" step="0.01" min="0"></label>
@@ -148,13 +119,8 @@
         <div id="emi_schedule" class="table-wrap"></div>
       </section>
 
-      <!-- NPS -->
       <section id="nps" class="card">
         <h2>NPS Corpus & Pension Estimator</h2>
-        <p class="desc">
-          Estimates National Pension System corpus at retirement using yearly contributions (optionally increasing)
-          and assumed returns. Also splits mandatory annuity (min 40%) and estimates monthly pension given an annuity rate.
-        </p>
         <div class="grid">
           <label>Yearly Contribution (₹)<input type="number" id="nps_contrib" value="100000" min="0"></label>
           <label>Annual Increase in Contribution (% per year)<input type="number" id="nps_stepup" value="5" step="0.1" min="0"></label>
@@ -165,21 +131,15 @@
         </div>
         <button class="btn" onclick="calcNPS()">Calculate</button>
         <div id="nps_result" class="result"></div>
-      
         <div id="nps_schedule" class="table-wrap"></div>
       </section>
 
-      <!-- PPF -->
       <section id="ppf" class="card">
         <h2>PPF Maturity Calculator</h2>
-        <p class="desc">
-          Approximates Public Provident Fund maturity. Assumes a fixed annual deposit and annual compounding.
-          (Actual PPF interest is calculated monthly on the lower balance between 5th and end; this is a close approximation.)
-        </p>
         <div class="grid">
           <label>Yearly Deposit (₹)<input type="number" id="ppf_yearly" value="150000" min="0"></label>
           <label>Interest Rate (% p.a.)<input type="number" id="ppf_rate" value="7.1" step="0.01" min="0"></label>
-          <label>Years (default 15)<input type="number" id="ppf_years" value="15" step="1" min="1"></label>
+          <label>Years<input type="number" id="ppf_years" value="15" step="1" min="1"></label>
           <label>Deposit Timing
             <select id="ppf_timing">
               <option value="start">Start of year</option>
@@ -189,14 +149,11 @@
         </div>
         <button class="btn" onclick="calcPPF()">Calculate</button>
         <div id="ppf_result" class="result"></div>
-      
         <div id="ppf_schedule" class="table-wrap"></div>
       </section>
 
-      <!-- CAGR -->
       <section id="cagr" class="card">
         <h2>CAGR (Compound Annual Growth Rate)</h2>
-        <p class="desc">Computes the annualized return between a starting value and ending value over a period.</p>
         <div class="grid">
           <label>Starting Value (₹)<input type="number" id="cagr_start" value="100000" min="0"></label>
           <label>Ending Value (₹)<input type="number" id="cagr_end" value="200000" min="0"></label>
@@ -204,16 +161,11 @@
         </div>
         <button class="btn" onclick="calcCAGR()">Calculate</button>
         <div id="cagr_result" class="result"></div>
-      
         <div id="cagr_schedule" class="table-wrap"></div>
       </section>
 
-      <!-- Inflation -->
       <section id="inflation" class="card">
         <h2>Inflation & Real Returns</h2>
-        <p class="desc">
-          Converts a nominal return into a real (inflation-adjusted) return and adjusts future value to today's money.
-        </p>
         <div class="grid">
           <label>Nominal Return (% p.a.)<input type="number" id="inf_nom" value="12" step="0.01" min="0"></label>
           <label>Inflation (% p.a.)<input type="number" id="inf_infl" value="6" step="0.01" min="0"></label>
@@ -221,36 +173,27 @@
         </div>
         <button class="btn" onclick="calcInflation()">Calculate</button>
         <div id="inflation_result" class="result"></div>
-      
         <div id="inflation_schedule" class="table-wrap"></div>
       </section>
 
-      <!-- Goal SIP -->
       <section id="goal" class="card">
         <h2>Goal-based SIP Requirement</h2>
-        <p class="desc">
-          Calculates the monthly SIP needed to reach a target corpus, given an expected return and tenure.
-        </p>
+        <p class="desc">Monthly SIP needed to reach a target. Uses effective monthly rate from annual and supports start/end timing.</p>
         <div class="grid">
           <label>Target Corpus (₹)<input type="number" id="goal_target" value="10000000" min="0"></label>
-          <label>Expected Return (% p.a.)<input type="number" id="goal_rate" value="12" step="0.01" min="0"></label>
+          <label>Expected Return (% p.a.)<input type="number" id="goal_rate" value="10" step="0.01" min="0"></label>
           <label>Tenure (years)<input type="number" id="goal_years" value="15" step="0.5" min="0.5"></label>
-          <label>Payment Timing
-            <select id="goal_timing">
-              <option value="end" selected>End of month</option>
-              <option value="start">Start of month</option>
-            </select>
-          </label>
-        </div>
+          </div>
         <button class="btn" onclick="calcGoal()">Calculate</button>
         <div id="goal_result" class="result"></div>
-      
         <div id="goal_schedule" class="table-wrap"></div>
+        <p id="calc_disclaimer" class="desc" style="margin-top:8px">Disclaimer: Please note that these calculators are for illustrations only and do not represent actual returns. Stock market does not have a fixed rate of return and it is not possible to predict the rate of return.</p>
       </section>
 
       <footer class="footer">
         <p>Made for India • Educational estimates. Verify rates & terms with your bank / provider.</p>
-      <p>Developed by <b>Arunprasanth</b></p></footer>
+        <p>Developed by <b>Arunprasanth</b></p>
+      </footer>
     </main>
   </div>
 
