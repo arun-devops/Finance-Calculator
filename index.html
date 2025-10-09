@@ -18,22 +18,54 @@
   <div class="container">
     <aside class="sidebar">
       <nav>
-        <a href="#fd">Fixed Deposit (FD)</a>
-        <a href="#rd">Recurring Deposit (RD)</a>
-        <a href="#sip">SIP (Mutual Funds)</a>
-        <a href="#lumpsum">Lumpsum Investment</a>
-        <a href="#swp">SWP (Systematic Withdrawal)</a>
-        <a href="#emi">Loan EMI (Home/Personal/Car/Edu)</a>
-        <a href="#nps">NPS Corpus & Pension</a>
-        <a href="#ppf">PPF Maturity</a>
-        <a href="#cagr">CAGR</a>
-        <a href="#inflation">Inflation & Real Returns</a>
-        <a href="#goal">Goal-based SIP</a>
-        <a href="#supersip">Super SIP (Step-up vs Fixed)</a>
+        <div class="nav-category">
+          <div class="category-header">🏦 Deposits & Savings</div>
+          <a href="#fd">Fixed Deposit (FD)</a>
+          <a href="#rd">Recurring Deposit (RD)</a>
+          <a href="#ppf">PPF Maturity</a>
+        </div>
+        
+        <div class="nav-category">
+          <div class="category-header">📈 Mutual Funds & Investments</div>
+          <a href="#sip">SIP (Mutual Funds)</a>
+          <a href="#lumpsum">Lumpsum Investment</a>
+          <a href="#swp">SWP (Systematic Withdrawal)</a>
+          <a href="#goal">Goal-based SIP</a>
+          <a href="#supersip">Super SIP (Step-up vs Fixed)</a>
+        </div>
+        
+        <div class="nav-category">
+          <div class="category-header">🏠 Loans</div>
+          <a href="#emi">Loan EMI (Home/Personal/Car/Edu)</a>
+          <a href="#prepayment">Loan Prepayment Impact</a>
+          <a href="#creditcard">Credit Card EMI vs Full Payment</a>
+        </div>
+        
+        <div class="nav-category">
+          <div class="category-header">🏛️ Retirement & Pension</div>
+          <a href="#nps">NPS Corpus & Pension</a>
+          <a href="#epf">EPF Maturity</a>
+        </div>
+        
+        <div class="nav-category">
+          <div class="category-header">📊 Analysis & Tools</div>
+          <a href="#cagr">CAGR</a>
+          <a href="#inflation">Inflation & Real Returns</a>
+        </div>
+        
+        <div class="nav-category">
+          <div class="category-header">🔧 Utilities & Resources</div>
+          <a href="inflation-data.html">Inflation Data</a>
+          <a href="calculator.html">Basic Calculator</a>
+        </div>
       </nav>
     </aside>
 
     <main class="content">
+      <div class="section-category-header">
+        <h1>🏦 Deposits & Savings</h1>
+      </div>
+      
       <section id="fd" class="card">
         <h2>Fixed Deposit (FD) Calculator</h2>
         <p class="desc">Quarterly compounding typical in India; choose compounding if different.</p>
@@ -50,7 +82,10 @@
             </select>
           </label>
         </div>
-        <button class="btn" onclick="calcFD()">Calculate</button>
+        <div class="button-group">
+          <button class="btn" onclick="calcFD()">Calculate</button>
+          <button class="btn btn-secondary" onclick="clearFD()">Clear</button>
+        </div>
         <div id="fd_result" class="result"></div>
         <div id="fd_chart_container" class="chart-container" style="display: none;">
           <canvas id="fd_chart"></canvas>
@@ -66,13 +101,44 @@
           <label>Annual Interest Rate (% p.a.)<input type="number" id="rd_rate" value="7" step="0.01" min="0"></label>
           <label>Tenure (months)<input type="number" id="rd_months" value="36" min="1" step="1"></label>
         </div>
-        <button class="btn" onclick="calcRD()">Calculate</button>
+        <div class="button-group">
+          <button class="btn" onclick="calcRD()">Calculate</button>
+          <button class="btn btn-secondary" onclick="clearRD()">Clear</button>
+        </div>
         <div id="rd_result" class="result"></div>
         <div id="rd_chart_container" class="chart-container" style="display: none;">
           <canvas id="rd_chart"></canvas>
         </div>
         <div id="rd_schedule" class="table-wrap"></div>
       </section>
+
+      <section id="ppf" class="card">
+        <h2>PPF Maturity Calculator</h2>
+        <div class="grid">
+          <label>Yearly Deposit (₹)<input type="number" id="ppf_yearly" value="150000" min="0"></label>
+          <label>Interest Rate (% p.a.)<input type="number" id="ppf_rate" value="7.1" step="0.01" min="0"></label>
+          <label>Years<input type="number" id="ppf_years" value="15" step="1" min="1"></label>
+          <label>Deposit Timing
+            <select id="ppf_timing">
+              <option value="start">Start of year</option>
+              <option value="end" selected>End of year</option>
+            </select>
+          </label>
+        </div>
+        <div class="button-group">
+          <button class="btn" onclick="calcPPF()">Calculate</button>
+          <button class="btn btn-secondary" onclick="clearPPF()">Clear</button>
+        </div>
+        <div id="ppf_result" class="result"></div>
+        <div id="ppf_chart_container" class="chart-container" style="display: none;">
+          <canvas id="ppf_chart"></canvas>
+        </div>
+        <div id="ppf_schedule" class="table-wrap"></div>
+      </section>
+
+      <div class="section-category-header">
+        <h1>📈 Mutual Funds & Investments</h1>
+      </div>
 
       <section id="sip" class="card">
         <h2>SIP (Systematic Investment Plan)</h2>
@@ -82,7 +148,10 @@
           <label>Expected Return (% p.a.)<input type="number" id="sip_rate" value="12" step="0.01" min="0"></label>
           <label>Tenure (years)<input type="number" id="sip_years" value="10" step="0.5" min="0.5"></label>
           </div>
-        <button class="btn" onclick="calcSIP()">Calculate</button>
+        <div class="button-group">
+          <button class="btn" onclick="calcSIP()">Calculate</button>
+          <button class="btn btn-secondary" onclick="clearSIP()">Clear</button>
+        </div>
         <div id="sip_result" class="result"></div>
         <div id="sip_chart_container" class="chart-container" style="display: none;">
           <canvas id="sip_chart"></canvas>
@@ -98,7 +167,10 @@
           <label>Expected Return (% p.a.)<input type="number" id="ls_rate" value="12" step="0.01" min="0"></label>
           <label>Tenure (years)<input type="number" id="ls_years" value="10" step="0.5" min="0.5"></label>
         </div>
-        <button class="btn" onclick="calcLumpsum()">Calculate</button>
+        <div class="button-group">
+          <button class="btn" onclick="calcLumpsum()">Calculate</button>
+          <button class="btn btn-secondary" onclick="clearLumpsum()">Clear</button>
+        </div>
         <div id="ls_result" class="result"></div>
         <div id="ls_chart_container" class="chart-container" style="display: none;">
           <canvas id="ls_chart"></canvas>
@@ -115,91 +187,15 @@
           <label>Expected Return (% p.a.)<input type="number" id="swp_rate" value="10" step="0.01" min="0"></label>
           <label>Tenure (years)<input type="number" id="swp_years" value="20" step="0.5" min="0.5"></label>
         </div>
-        <button class="btn" onclick="calcSWP()">Calculate</button>
+        <div class="button-group">
+          <button class="btn" onclick="calcSWP()">Calculate</button>
+          <button class="btn btn-secondary" onclick="clearSWP()">Clear</button>
+        </div>
         <div id="swp_result" class="result"></div>
         <div id="swp_chart_container" class="chart-container" style="display: none;">
           <canvas id="swp_chart"></canvas>
         </div>
         <div id="swp_schedule" class="table-wrap"></div>
-      </section>
-
-      <section id="emi" class="card">
-        <h2>Loan EMI (Home / Personal / Car / Education)</h2>
-        <p class="desc">Standard EMI formula with amortization table.</p>
-        <div class="grid">
-          <label>Loan Amount (₹)<input type="number" id="emi_principal" value="3000000" min="0"></label>
-          <label>Annual Interest Rate (% p.a.)<input type="number" id="emi_rate" value="8.5" step="0.01" min="0"></label>
-          <label>Tenure (years)<input type="number" id="emi_years" value="20" step="0.5" min="0.5"></label>
-        </div>
-        <button class="btn" onclick="calcEMI()">Calculate</button>
-        <div id="emi_result" class="result"></div>
-        <div id="emi_chart_container" class="chart-container" style="display: none;">
-          <canvas id="emi_chart"></canvas>
-        </div>
-        <div id="emi_schedule" class="table-wrap"></div>
-      </section>
-
-      <section id="nps" class="card">
-        <h2>NPS Corpus & Pension Estimator</h2>
-        <div class="grid">
-          <label>Yearly Contribution (₹)<input type="number" id="nps_contrib" value="100000" min="0"></label>
-          <label>Annual Increase in Contribution (% per year)<input type="number" id="nps_stepup" value="5" step="0.1" min="0"></label>
-          <label>Expected Return Pre-Retirement (% p.a.)<input type="number" id="nps_return" value="10" step="0.1" min="0"></label>
-          <label>Years to Retirement<input type="number" id="nps_years" value="30" step="1" min="1"></label>
-          <label>Annuity Purchase (% of corpus)<input type="number" id="nps_annuity_pct" value="40" step="1" min="40" max="100"></label>
-          <label>Annuity Rate (% p.a.)<input type="number" id="nps_annuity_rate" value="6.5" step="0.1" min="0"></label>
-        </div>
-        <button class="btn" onclick="calcNPS()">Calculate</button>
-        <div id="nps_result" class="result"></div>
-        <div id="nps_chart_container" class="chart-container" style="display: none;">
-          <canvas id="nps_chart"></canvas>
-        </div>
-        <div id="nps_schedule" class="table-wrap"></div>
-      </section>
-
-      <section id="ppf" class="card">
-        <h2>PPF Maturity Calculator</h2>
-        <div class="grid">
-          <label>Yearly Deposit (₹)<input type="number" id="ppf_yearly" value="150000" min="0"></label>
-          <label>Interest Rate (% p.a.)<input type="number" id="ppf_rate" value="7.1" step="0.01" min="0"></label>
-          <label>Years<input type="number" id="ppf_years" value="15" step="1" min="1"></label>
-          <label>Deposit Timing
-            <select id="ppf_timing">
-              <option value="start">Start of year</option>
-              <option value="end" selected>End of year</option>
-            </select>
-          </label>
-        </div>
-        <button class="btn" onclick="calcPPF()">Calculate</button>
-        <div id="ppf_result" class="result"></div>
-        <div id="ppf_chart_container" class="chart-container" style="display: none;">
-          <canvas id="ppf_chart"></canvas>
-        </div>
-        <div id="ppf_schedule" class="table-wrap"></div>
-      </section>
-
-      <section id="cagr" class="card">
-        <h2>CAGR (Compound Annual Growth Rate)</h2>
-        <div class="grid">
-          <label>Starting Value (₹)<input type="number" id="cagr_start" value="100000" min="0"></label>
-          <label>Ending Value (₹)<input type="number" id="cagr_end" value="200000" min="0"></label>
-          <label>Years<input type="number" id="cagr_years" value="5" step="0.1" min="0.1"></label>
-        </div>
-        <button class="btn" onclick="calcCAGR()">Calculate</button>
-        <div id="cagr_result" class="result"></div>
-        <div id="cagr_schedule" class="table-wrap"></div>
-      </section>
-
-      <section id="inflation" class="card">
-        <h2>Inflation & Real Returns</h2>
-        <div class="grid">
-          <label>Nominal Return (% p.a.)<input type="number" id="inf_nom" value="12" step="0.01" min="0"></label>
-          <label>Inflation (% p.a.)<input type="number" id="inf_infl" value="6" step="0.01" min="0"></label>
-          <label>Future Value (₹)<input type="number" id="inf_fv" value="1000000" min="0"></label>
-        </div>
-        <button class="btn" onclick="calcInflation()">Calculate</button>
-        <div id="inflation_result" class="result"></div>
-        <div id="inflation_schedule" class="table-wrap"></div>
       </section>
 
       <section id="goal" class="card">
@@ -210,7 +206,10 @@
           <label>Expected Return (% p.a.)<input type="number" id="goal_rate" value="10" step="0.01" min="0"></label>
           <label>Tenure (years)<input type="number" id="goal_years" value="15" step="0.5" min="0.5"></label>
           </div>
-        <button class="btn" onclick="calcGoal()">Calculate</button>
+        <div class="button-group">
+          <button class="btn" onclick="calcGoal()">Calculate</button>
+          <button class="btn btn-secondary" onclick="clearGoal()">Clear</button>
+        </div>
         <div id="goal_result" class="result"></div>
         <div id="goal_chart_container" class="chart-container" style="display: none;">
           <canvas id="goal_chart"></canvas>
@@ -227,12 +226,188 @@
           <label>Expected Return (% p.a.)<input type="number" id="supersip_rate" value="12" step="0.01" min="0"></label>
           <label>Tenure (years)<input type="number" id="supersip_years" value="25" step="1" min="1"></label>
         </div>
-        <button class="btn" onclick="calcSuperSIP()">Calculate & Compare</button>
+        <div class="button-group">
+          <button class="btn" onclick="calcSuperSIP()">Calculate & Compare</button>
+          <button class="btn btn-secondary" onclick="clearSuperSIP()">Clear</button>
+        </div>
         <div id="supersip_result" class="result"></div>
         <div id="supersip_chart_container" class="chart-container" style="display: none;">
           <canvas id="supersip_chart"></canvas>
         </div>
         <div id="supersip_schedule" class="table-wrap"></div>
+      </section>
+
+      <div class="section-category-header">
+        <h1>🏠 Loans</h1>
+      </div>
+
+      <section id="emi" class="card">
+        <h2>Loan EMI (Home / Personal / Car / Education)</h2>
+        <p class="desc">Standard EMI formula with amortization table.</p>
+        <div class="grid">
+          <label>Loan Amount (₹)<input type="number" id="emi_principal" value="3000000" min="0"></label>
+          <label>Annual Interest Rate (% p.a.)<input type="number" id="emi_rate" value="8.5" step="0.01" min="0"></label>
+          <label>Tenure (years)<input type="number" id="emi_years" value="20" step="0.5" min="0.5"></label>
+        </div>
+        <div class="button-group">
+          <button class="btn" onclick="calcEMI()">Calculate</button>
+          <button class="btn btn-secondary" onclick="clearEMI()">Clear</button>
+        </div>
+        <div id="emi_result" class="result"></div>
+        <div id="emi_chart_container" class="chart-container" style="display: none;">
+          <canvas id="emi_chart"></canvas>
+        </div>
+        <div id="emi_schedule" class="table-wrap"></div>
+      </section>
+
+      <section id="prepayment" class="card">
+        <h2>Loan Prepayment Impact Calculator</h2>
+        <p class="desc">Calculate savings from loan prepayment - one-time or annual recurring prepayments.</p>
+        <div class="grid">
+          <label>Loan Amount (₹)<input type="number" id="prepay_principal" value="2500000" min="0"></label>
+          <label>Annual Interest Rate (% p.a.)<input type="number" id="prepay_rate" value="8.5" step="0.01" min="0"></label>
+          <label>Loan Tenure (years)<input type="number" id="prepay_tenure" value="20" step="0.5" min="0.5"></label>
+          <label>Prepayment Amount (₹)<input type="number" id="prepay_amount" value="500000" min="0"></label>
+          <label>Prepayment Frequency
+            <select id="prepay_frequency">
+              <option value="one_time">One-time (after specified months)</option>
+              <option value="annual" selected>Annual (every year)</option>
+            </select>
+          </label>
+          <label>Start Prepayment After (months)<input type="number" id="prepay_after" value="12" min="1" step="1"></label>
+          <label>Prepayment Type
+            <select id="prepay_type">
+              <option value="reduce_tenure">Reduce Tenure</option>
+              <option value="reduce_emi" selected>Reduce EMI</option>
+            </select>
+          </label>
+        </div>
+        <div class="button-group">
+          <button class="btn" onclick="calcPrepayment()">Calculate Impact</button>
+          <button class="btn btn-secondary" onclick="clearPrepayment()">Clear</button>
+        </div>
+        <div id="prepay_result" class="result"></div>
+        <div id="prepay_chart_container" class="chart-container" style="display: none;">
+          <canvas id="prepay_chart"></canvas>
+        </div>
+        <div id="prepay_schedule" class="table-wrap"></div>
+      </section>
+
+      <section id="creditcard" class="card">
+        <h2>Credit Card EMI vs Full Payment Cost</h2>
+        <p class="desc">Compare cost of paying credit card bill in EMI vs full payment with opportunity cost.</p>
+        <div class="grid">
+          <label>Credit Card Bill Amount (₹)<input type="number" id="cc_amount" value="50000" min="0"></label>
+          <label>Credit Card Interest Rate (% p.a.)<input type="number" id="cc_rate" value="36" step="0.01" min="0"></label>
+          <label>EMI Tenure (months)<input type="number" id="cc_tenure" value="12" min="1" step="1"></label>
+          <label>Alternative Investment Return (% p.a.)<input type="number" id="cc_alt_return" value="12" step="0.01" min="0"></label>
+          <label>Processing Fee (₹)<input type="number" id="cc_processing_fee" value="199" min="0"></label>
+        </div>
+        <div class="button-group">
+          <button class="btn" onclick="calcCreditCard()">Compare Options</button>
+          <button class="btn btn-secondary" onclick="clearCreditCard()">Clear</button>
+        </div>
+        <div id="cc_result" class="result"></div>
+        <div id="cc_chart_container" class="chart-container" style="display: none;">
+          <canvas id="cc_chart"></canvas>
+        </div>
+        <div id="cc_schedule" class="table-wrap"></div>
+      </section>
+
+      <div class="section-category-header">
+        <h1>🏛️ Retirement & Pension</h1>
+      </div>
+
+      <section id="nps" class="card">
+        <h2>NPS Corpus & Pension Estimator</h2>
+        <div class="grid">
+          <label>Yearly Contribution (₹)<input type="number" id="nps_contrib" value="100000" min="0"></label>
+          <label>Annual Increase in Contribution (% per year)<input type="number" id="nps_stepup" value="5" step="0.1" min="0"></label>
+          <label>Expected Return Pre-Retirement (% p.a.)<input type="number" id="nps_return" value="10" step="0.1" min="0"></label>
+          <label>Years to Retirement<input type="number" id="nps_years" value="30" step="1" min="1"></label>
+          <label>Annuity Purchase (% of corpus)<input type="number" id="nps_annuity_pct" value="40" step="1" min="40" max="100"></label>
+          <label>Annuity Rate (% p.a.)<input type="number" id="nps_annuity_rate" value="6.5" step="0.1" min="0"></label>
+        </div>
+        <div class="button-group">
+          <button class="btn" onclick="calcNPS()">Calculate</button>
+          <button class="btn btn-secondary" onclick="clearNPS()">Clear</button>
+        </div>
+        <div id="nps_result" class="result"></div>
+        <div id="nps_chart_container" class="chart-container" style="display: none;">
+          <canvas id="nps_chart"></canvas>
+        </div>
+        <div id="nps_schedule" class="table-wrap"></div>
+      </section>
+
+      <section id="epf" class="card">
+        <h2>EPF (Employee Provident Fund) Maturity Calculator</h2>
+        <p class="desc">Calculate EPF maturity with employee + employer contributions. Current EPF interest rate is around 8.15% p.a.</p>
+        <div class="grid">
+          <label>Monthly Basic Salary (₹)<input type="number" id="epf_salary" value="50000" min="0"></label>
+          <label>Contribution Type
+            <select id="epf_contribution_type" onchange="toggleEPFContributionType()">
+              <option value="percentage">Percentage of Basic Salary</option>
+              <option value="fixed">Fixed Monthly Amount</option>
+            </select>
+          </label>
+        </div>
+        <div class="grid" id="epf_percentage_fields">
+          <label>Employee Contribution (% of basic)<input type="number" id="epf_employee_pct" value="12" step="0.1" min="0" max="12"></label>
+          <label>Employer Contribution (% of basic)<input type="number" id="epf_employer_pct" value="12" step="0.1" min="0" max="12"></label>
+        </div>
+        <div class="grid" id="epf_fixed_fields" style="display: none;">
+          <label>Employee Monthly Contribution (₹)<input type="number" id="epf_employee_fixed" value="6000" min="0"></label>
+          <label>Employer Monthly Contribution (₹)<input type="number" id="epf_employer_fixed" value="6000" min="0"></label>
+        </div>
+        <div class="grid">
+          <label>Current EPF Balance (₹)<input type="number" id="epf_current_balance" value="0" min="0"></label>
+          <label>EPF Interest Rate (% p.a.)<input type="number" id="epf_rate" value="8.15" step="0.01" min="0"></label>
+          <label>Years to Retirement<input type="number" id="epf_years" value="25" step="1" min="1"></label>
+          <label>Annual Salary Increase (% p.a.)<input type="number" id="epf_salary_increase" value="7" step="0.1" min="0"></label>
+        </div>
+        <div class="button-group">
+          <button class="btn" onclick="calcEPF()">Calculate EPF Maturity</button>
+          <button class="btn btn-secondary" onclick="clearEPF()">Clear</button>
+        </div>
+        <div id="epf_result" class="result"></div>
+        <div id="epf_chart_container" class="chart-container" style="display: none;">
+          <canvas id="epf_chart"></canvas>
+        </div>
+        <div id="epf_schedule" class="table-wrap"></div>
+      </section>
+
+      <div class="section-category-header">
+        <h1>📊 Analysis & Tools</h1>
+      </div>
+
+      <section id="cagr" class="card">
+        <h2>CAGR (Compound Annual Growth Rate)</h2>
+        <div class="grid">
+          <label>Starting Value (₹)<input type="number" id="cagr_start" value="100000" min="0"></label>
+          <label>Ending Value (₹)<input type="number" id="cagr_end" value="200000" min="0"></label>
+          <label>Years<input type="number" id="cagr_years" value="5" step="0.1" min="0.1"></label>
+        </div>
+        <div class="button-group">
+          <button class="btn" onclick="calcCAGR()">Calculate</button>
+          <button class="btn btn-secondary" onclick="clearCAGR()">Clear</button>
+        </div>
+        <div id="cagr_result" class="result"></div>
+        <div id="cagr_schedule" class="table-wrap"></div>
+      </section>
+
+      <section id="inflation" class="card">
+        <h2>Inflation & Real Returns</h2>
+        <div class="grid">
+          <label>Nominal Return (% p.a.)<input type="number" id="inf_nom" value="12" step="0.01" min="0"></label>
+          <label>Inflation (% p.a.)<input type="number" id="inf_infl" value="6" step="0.01" min="0"></label>
+          <label>Future Value (₹)<input type="number" id="inf_fv" value="1000000" min="0"></label>
+        </div>
+        <div class="button-group">
+          <button class="btn" onclick="calcInflation()">Calculate</button>
+          <button class="btn btn-secondary" onclick="clearInflation()">Clear</button>
+        </div>
+        <div id="inflation_result" class="result"></div>
+        <div id="inflation_schedule" class="table-wrap"></div>
       </section>
 
       <div class="disclaimer-section" style="background: var(--card); border: 1px solid #1e2a44; border-radius: 16px; padding: 16px; margin: 16px 0; text-align: center;">
@@ -241,14 +416,6 @@
         </p>
       </div>
 
-      <div style="text-align: center; margin: 20px 0;">
-        <a href="inflation-data.html" style="display: inline-block; padding: 12px 24px; background: var(--acc); color: #00102a; text-decoration: none; border-radius: 12px; font-weight: 600; transition: all 0.2s ease; margin: 0 10px;">
-          📊 Inflation Data
-        </a>
-        <a href="calculator.html" style="display: inline-block; padding: 12px 24px; background: var(--acc); color: #00102a; text-decoration: none; border-radius: 12px; font-weight: 600; transition: all 0.2s ease; margin: 0 10px;">
-          🧮 Basic Calculator
-        </a>
-      </div>
 
       <footer class="footer">
         <p>Made for India • Educational estimates. Verify rates & terms with your bank / provider.</p>
