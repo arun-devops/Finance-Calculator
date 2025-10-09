@@ -50,24 +50,28 @@ td:first-child,th:first-child{text-align:left}
   --bg:#f5f7fb;
   --card:#ffffff;
   --text:#0d1b2a;
-  --muted:#475569;
+  --muted:#374151;
   --acc:#0d6efd;
 }
 .light .app-header{background:#ffffff;border-bottom:1px solid #dee2e6;}
-.light .title{color:#0d1b2a}
-.light .subtitle{color:#475569}
+.light .title{color:#0d1b2a !important;font-weight:700}
+.light .subtitle{color:#374151 !important;font-weight:500}
 .light input,.light select{background:#fff;color:#0d1b2a;border:1px solid #ced4da}
 .light .btn{background:var(--acc);color:#fff}
 .light .sidebar{background:#f8f9fa;border:1px solid #dee2e6}
-.light .sidebar a{color:#0d1b2a}
+.light .sidebar a{color:#0d1b2a !important;font-weight:500}
 .light .sidebar a:hover{background:#e9ecef;border-color:#ced4da}
 .light .card{background:#ffffff;border:1px solid #dee2e6}
-.light .result{background:#f1f3f5;border:1px solid #dee2e6;color:#212529}
-.light .kpi div{background:#ffffff;border:1px solid #dee2e6;color:#0d1b2a}
-.light .kpi .l{color:#475569}
+.light .card h2{color:#0d1b2a !important;font-weight:700}
+.light .desc{color:#374151 !important;font-weight:500}
+.light label{color:#0d1b2a !important;font-weight:600}
+.light .result{background:#f1f3f5;border:1px solid #dee2e6;color:#0d1b2a !important}
+.light .kpi div{background:#ffffff;border:1px solid #dee2e6;color:#0d1b2a !important}
+.light .kpi .v{color:#0d1b2a !important;font-weight:800}
+.light .kpi .l{color:#374151 !important;font-weight:600}
 .light .table-wrap{border-color:#dee2e6}
-.light th{background:#f1f3f5 !important;color:#0d1b2a !important;border-bottom:1px solid #ced4da}
-.light td{color:#0d1b2a}
+.light th{background:#f1f3f5 !important;color:#0d1b2a !important;border-bottom:1px solid #ced4da;font-weight:700}
+.light td{color:#0d1b2a !important;font-weight:500}
 .warning{background:#fff3cd;color:#5f441a;border:1px solid #ffec99;padding:8px;border-radius:8px;margin-top:8px;}
 
 .desc strong{font-weight:700}
@@ -81,8 +85,12 @@ td:first-child,th:first-child{text-align:left}
 .payout .prow div{background:#0b1324;border:1px solid #22304d;border-radius:10px;padding:10px}
 .payout .v{display:block;font-weight:800;margin-top:6px}
 .payout .l{font-size:11px;color:#a8b6d8}
-.light .payout .prow div{background:#fff;border-color:#dee2e6}
-.light .payout .l{color:#475569}
+.light .payout{border-top:1px dashed #6c757d}
+.light .payout .phead{color:#0d1b2a !important;font-weight:600}
+.light .payout .prow div{background:#fff;border-color:#dee2e6;color:#0d1b2a !important}
+.light .payout .v{color:#0d1b2a !important;font-weight:800}
+.light .payout .l{color:#374151 !important;font-weight:600}
+.light .pnote{color:#374151 !important;font-weight:500}
 
 /* Super SIP Comparison Styles */
 .comparison-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
@@ -94,8 +102,34 @@ td:first-child,th:first-child{text-align:left}
 .light .comparison-section h3{color:#0d1b2a}
 .light .comparison-advantage{background:#e8f5e8;border-color:#c3e6c3}
 .light .comparison-advantage h3{color:#2e7d32}
+.light .footer{color:#374151 !important;font-weight:500}
+.light .warning{background:#fff3cd;color:#5f441a !important;border:1px solid #ffec99;font-weight:600}
+
+/* Additional light theme text improvements */
+.light *{color:#0d1b2a}
+.light .desc strong{color:#0d1b2a !important;font-weight:700}
+.light .pnote{color:#374151 !important;font-weight:500}
 
 @media (max-width: 768px){
   .comparison-grid{grid-template-columns:1fr}
   .comparison-advantage{grid-column:1}
+}
+
+/* Chart Styles */
+.chart-container {
+  margin: 16px 0;
+  padding: 16px;
+  background: var(--card);
+  border: 1px solid #1e2a44;
+  border-radius: 12px;
+  height: 400px;
+}
+
+.light .chart-container {
+  background: #ffffff;
+  border-color: #dee2e6;
+}
+
+.chart-container canvas {
+  max-height: 100%;
 }

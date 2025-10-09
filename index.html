@@ -6,6 +6,7 @@
   <title>India Finance Calculator Suite</title>
   <link rel="stylesheet" href="style.css"/>
   <meta name="description" content="Indian finance calculators: FD, RD, SIP, Lumpsum, SWP, EMI, NPS, PPF, CAGR, Inflation, Goal SIP."/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class='theme-toggle' onclick='toggleTheme()'>🌓 Theme</div>
@@ -51,6 +52,9 @@
         </div>
         <button class="btn" onclick="calcFD()">Calculate</button>
         <div id="fd_result" class="result"></div>
+        <div id="fd_chart_container" class="chart-container" style="display: none;">
+          <canvas id="fd_chart"></canvas>
+        </div>
         <div id="fd_schedule" class="table-wrap"></div>
       </section>
 
@@ -64,6 +68,9 @@
         </div>
         <button class="btn" onclick="calcRD()">Calculate</button>
         <div id="rd_result" class="result"></div>
+        <div id="rd_chart_container" class="chart-container" style="display: none;">
+          <canvas id="rd_chart"></canvas>
+        </div>
         <div id="rd_schedule" class="table-wrap"></div>
       </section>
 
@@ -77,6 +84,9 @@
           </div>
         <button class="btn" onclick="calcSIP()">Calculate</button>
         <div id="sip_result" class="result"></div>
+        <div id="sip_chart_container" class="chart-container" style="display: none;">
+          <canvas id="sip_chart"></canvas>
+        </div>
         <div id="sip_schedule" class="table-wrap"></div>
       </section>
 
@@ -90,6 +100,9 @@
         </div>
         <button class="btn" onclick="calcLumpsum()">Calculate</button>
         <div id="ls_result" class="result"></div>
+        <div id="ls_chart_container" class="chart-container" style="display: none;">
+          <canvas id="ls_chart"></canvas>
+        </div>
         <div id="ls_schedule" class="table-wrap"></div>
       </section>
 
@@ -104,6 +117,9 @@
         </div>
         <button class="btn" onclick="calcSWP()">Calculate</button>
         <div id="swp_result" class="result"></div>
+        <div id="swp_chart_container" class="chart-container" style="display: none;">
+          <canvas id="swp_chart"></canvas>
+        </div>
         <div id="swp_schedule" class="table-wrap"></div>
       </section>
 
@@ -117,6 +133,9 @@
         </div>
         <button class="btn" onclick="calcEMI()">Calculate</button>
         <div id="emi_result" class="result"></div>
+        <div id="emi_chart_container" class="chart-container" style="display: none;">
+          <canvas id="emi_chart"></canvas>
+        </div>
         <div id="emi_schedule" class="table-wrap"></div>
       </section>
 
@@ -132,6 +151,9 @@
         </div>
         <button class="btn" onclick="calcNPS()">Calculate</button>
         <div id="nps_result" class="result"></div>
+        <div id="nps_chart_container" class="chart-container" style="display: none;">
+          <canvas id="nps_chart"></canvas>
+        </div>
         <div id="nps_schedule" class="table-wrap"></div>
       </section>
 
@@ -150,6 +172,9 @@
         </div>
         <button class="btn" onclick="calcPPF()">Calculate</button>
         <div id="ppf_result" class="result"></div>
+        <div id="ppf_chart_container" class="chart-container" style="display: none;">
+          <canvas id="ppf_chart"></canvas>
+        </div>
         <div id="ppf_schedule" class="table-wrap"></div>
       </section>
 
@@ -187,6 +212,9 @@
           </div>
         <button class="btn" onclick="calcGoal()">Calculate</button>
         <div id="goal_result" class="result"></div>
+        <div id="goal_chart_container" class="chart-container" style="display: none;">
+          <canvas id="goal_chart"></canvas>
+        </div>
         <div id="goal_schedule" class="table-wrap"></div>
       </section>
 
@@ -201,6 +229,9 @@
         </div>
         <button class="btn" onclick="calcSuperSIP()">Calculate & Compare</button>
         <div id="supersip_result" class="result"></div>
+        <div id="supersip_chart_container" class="chart-container" style="display: none;">
+          <canvas id="supersip_chart"></canvas>
+        </div>
         <div id="supersip_schedule" class="table-wrap"></div>
       </section>
 
@@ -211,7 +242,10 @@
       </div>
 
       <div style="text-align: center; margin: 20px 0;">
-        <a href="calculator.html" style="display: inline-block; padding: 12px 24px; background: var(--acc); color: #00102a; text-decoration: none; border-radius: 12px; font-weight: 600; transition: all 0.2s ease;">
+        <a href="inflation-data.html" style="display: inline-block; padding: 12px 24px; background: var(--acc); color: #00102a; text-decoration: none; border-radius: 12px; font-weight: 600; transition: all 0.2s ease; margin: 0 10px;">
+          📊 Inflation Data
+        </a>
+        <a href="calculator.html" style="display: inline-block; padding: 12px 24px; background: var(--acc); color: #00102a; text-decoration: none; border-radius: 12px; font-weight: 600; transition: all 0.2s ease; margin: 0 10px;">
           🧮 Basic Calculator
         </a>
       </div>
@@ -223,6 +257,7 @@
     </main>
   </div>
 
+  <script src="inflation-data.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

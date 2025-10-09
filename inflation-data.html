@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>India Historical Inflation Data | Finance Calculator Suite</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --primary-color: #5b9df9;
+            --secondary-color: #0d6efd;
+            --card-bg: #121a2b;
+            --input-bg: #0b1324;
+            --text-secondary: #8aa0c6;
+            --border-color: #22304d;
+            --hover-bg: #0f1524;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .light {
+            --primary-color: #0d6efd;
+            --secondary-color: #5b9df9;
+            --card-bg: #ffffff;
+            --input-bg: #f8f9fa;
+            --text-secondary: #475569;
+            --border-color: #dee2e6;
+            --hover-bg: #e9ecef;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .inflation-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 15px;
+            color: white;
+        }
+        
+        .page-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+        }
+        
+        .page-header p {
+            margin: 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .navigation {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .nav-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #0d6efd !important;
+            color: #ffffff !important;
+            text-decoration: none !important;
+            border-radius: 8px;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            font-weight: 700 !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: none !important;
+        }
+        
+        .nav-button:hover {
+            background: #0056b3 !important;
+            color: #ffffff !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            text-decoration: none !important;
+        }
+        
+        .nav-button:visited {
+            color: #ffffff !important;
+        }
+        
+        .nav-button:active {
+            color: #ffffff !important;
+        }
+        
+        .light .nav-button {
+            background: #0d6efd !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+        }
+        
+        .light .nav-button:hover {
+            background: #0056b3 !important;
+            color: #ffffff !important;
+        }
+        
+        .light .nav-button:visited {
+            color: #ffffff !important;
+        }
+        
+        .light .nav-button:active {
+            color: #ffffff !important;
+        }
+        
+        .data-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+        
+        .inflation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .inflation-table th,
+        .inflation-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .inflation-table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .inflation-table tr:hover {
+            background: var(--hover-bg);
+        }
+        
+        .decade-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .decade-card {
+            background: var(--input-bg);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .decade-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .decade-avg {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+        
+        .decade-range {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #856404;
+        }
+        
+        .highlight-box h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+        
+        .light .highlight-box {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 1px solid #ffc107;
+            color: #856404;
+        }
+        
+        .light .highlight-box h3 {
+            color: #856404;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: var(--input-bg);
+            border-radius: 8px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .inflation-table {
+                font-size: 0.9rem;
+            }
+            
+            .inflation-table th,
+            .inflation-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class='theme-toggle' onclick='toggleTheme()'>🌓 Theme</div>
+    <div class="inflation-page">
+        <div class="page-header">
+            <h1>📊 India Historical Inflation Data</h1>
+            <p>Review 64 years of inflation trends (1960-2024) before using our calculators for better financial planning</p>
+        </div>
+        
+        <div class="navigation">
+            <a href="index.html" class="nav-button" style="background: #0d6efd !important; color: #ffffff !important; font-weight: 700 !important; text-decoration: none !important;">🏠 Main Calculator</a>
+            <a href="calculator.html" class="nav-button" style="background: #0d6efd !important; color: #ffffff !important; font-weight: 700 !important; text-decoration: none !important;">🧮 Basic Calculator</a>
+        </div>
+        
+        <div class="data-section">
+            <h2 class="section-title">📈 Key Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="avgInflation">-</div>
+                    <div class="stat-label">Average Inflation (1960-2024)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="recentAvg">-</div>
+                    <div class="stat-label">Last 10 Years Average</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="highestYear">-</div>
+                    <div class="stat-label">Highest Inflation Year</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="lowestYear">-</div>
+                    <div class="stat-label">Lowest Inflation Year</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="data-section">
+            <h2 class="section-title">📅 Decade-wise Averages</h2>
+            <div class="decade-grid" id="decadeGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="highlight-box">
+            <h3>💡 Understanding Inflation Impact</h3>
+            <p><strong>What does this mean for your investments?</strong></p>
+            <ul>
+                <li>Higher inflation reduces purchasing power - ₹100 today buys less than ₹100 ten years ago</li>
+                <li>Your investments should ideally beat inflation to maintain real value</li>
+                <li>Historical averages help set realistic expectations for future planning</li>
+                <li>Consider inflation when calculating retirement corpus and future expenses</li>
+            </ul>
+        </div>
+        
+        <div class="data-section">
+            <h2 class="section-title">📋 Recent 10-Year Trends (2015-2024)</h2>
+            <table class="inflation-table" id="recentTable">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Inflation Rate</th>
+                        <th>Trend</th>
+                        <th>Economic Context</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="data-section">
+            <h2 class="section-title">📊 Complete Historical Data (1960-2024)</h2>
+            <p>Complete year-wise inflation data for reference. Use this data to understand long-term trends and make informed financial planning decisions.</p>
+            <table class="inflation-table" id="fullTable">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Inflation Rate (%)</th>
+                        <th>Decade</th>
+                        <th>Economic Period</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="highlight-box">
+            <h3>🎯 How to Use This Data in Our Calculators</h3>
+            <p><strong>Choose the right inflation rate for your planning:</strong></p>
+            <ol>
+                <li><strong>Long-term Planning (15+ years):</strong> Use 7% - the historical average since 1960</li>
+                <li><strong>Medium-term Planning (5-15 years):</strong> Use 5% - the recent 10-year average</li>
+                <li><strong>Conservative Planning:</strong> Use 6% - a balanced middle ground</li>
+                <li><strong>Scenario Testing:</strong> Try different rates (4%, 6%, 8%) to see various outcomes</li>
+            </ol>
+            <p><strong>💡 Pro Tip:</strong> Your investment returns should beat inflation by at least 2-3% to grow your real wealth!</p>
+        </div>
+        
+        <div class="navigation" style="margin-top: 40px;">
+            <a href="index.html" class="nav-button" style="background: #0d6efd !important; color: #ffffff !important; font-weight: 700 !important; text-decoration: none !important;">🚀 Start Calculating</a>
+            <a href="calculator.html" class="nav-button" style="background: #0d6efd !important; color: #ffffff !important; font-weight: 700 !important; text-decoration: none !important;">🧮 Basic Calculator</a>
+        </div>
+    </div>
+    
+    <script src="inflation-data.js"></script>
+    <script>
+        // Populate the page with inflation data
+        document.addEventListener('DOMContentLoaded', function() {
+            populateInflationPage();
+        });
+        
+        function populateInflationPage() {
+            // Calculate key statistics
+            const allRates = Object.values(indiaInflationData);
+            const avgInflation = allRates.reduce((sum, rate) => sum + rate, 0) / allRates.length;
+            
+            // Recent 10 years
+            const recentYears = Object.keys(indiaInflationData).slice(-10);
+            const recentRates = recentYears.map(year => indiaInflationData[year]);
+            const recentAvg = recentRates.reduce((sum, rate) => sum + rate, 0) / recentRates.length;
+            
+            // Find highest and lowest
+            let highestRate = -Infinity, lowestRate = Infinity;
+            let highestYear = '', lowestYear = '';
+            
+            for (const [year, rate] of Object.entries(indiaInflationData)) {
+                if (rate > highestRate) {
+                    highestRate = rate;
+                    highestYear = year;
+                }
+                if (rate < lowestRate) {
+                    lowestRate = rate;
+                    lowestYear = year;
+                }
+            }
+            
+            // Update statistics
+            document.getElementById('avgInflation').textContent = avgInflation.toFixed(1) + '%';
+            document.getElementById('recentAvg').textContent = recentAvg.toFixed(1) + '%';
+            document.getElementById('highestYear').textContent = `${highestYear} (${highestRate.toFixed(1)}%)`;
+            document.getElementById('lowestYear').textContent = `${lowestYear} (${lowestRate.toFixed(1)}%)`;
+            
+            // Populate decade grid
+            populateDecadeGrid();
+            
+            // Populate recent trends table
+            populateRecentTable();
+            
+            // Populate full historical table
+            populateFullTable();
+        }
+        
+        function populateDecadeGrid() {
+            const decades = getDecadeAverages();
+            const grid = document.getElementById('decadeGrid');
+            
+            decades.forEach(decade => {
+                const card = document.createElement('div');
+                card.className = 'decade-card';
+                card.innerHTML = `
+                    <div class="decade-title">${decade.period}</div>
+                    <div class="decade-avg">${decade.average.toFixed(1)}%</div>
+                    <div class="decade-range">Range: ${decade.min.toFixed(1)}% - ${decade.max.toFixed(1)}%</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+        
+        function getDecadeAverages() {
+            const decades = [
+                { period: '1960s', start: 1960, end: 1969 },
+                { period: '1970s', start: 1970, end: 1979 },
+                { period: '1980s', start: 1980, end: 1989 },
+                { period: '1990s', start: 1990, end: 1999 },
+                { period: '2000s', start: 2000, end: 2009 },
+                { period: '2010s', start: 2010, end: 2019 },
+                { period: '2020s', start: 2020, end: 2024 }
+            ];
+            
+            return decades.map(decade => {
+                const rates = [];
+                for (let year = decade.start; year <= decade.end; year++) {
+                    if (indiaInflationData[year] !== undefined) {
+                        rates.push(indiaInflationData[year]);
+                    }
+                }
+                
+                const average = rates.length > 0 ? rates.reduce((sum, rate) => sum + rate, 0) / rates.length : 0;
+                const min = rates.length > 0 ? Math.min(...rates) : 0;
+                const max = rates.length > 0 ? Math.max(...rates) : 0;
+                
+                return {
+                    period: decade.period,
+                    average,
+                    min,
+                    max
+                };
+            });
+        }
+        
+        function populateRecentTable() {
+            const tbody = document.querySelector('#recentTable tbody');
+            const recentYears = Object.keys(indiaInflationData).slice(-10).reverse();
+            
+            recentYears.forEach(year => {
+                const rate = indiaInflationData[year];
+                const trend = getTrend(year);
+                const context = getEconomicContext(year, rate);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${year}</td>
+                    <td>${rate.toFixed(1)}%</td>
+                    <td>${trend}</td>
+                    <td>${context}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function populateFullTable() {
+            const tbody = document.querySelector('#fullTable tbody');
+            const years = Object.keys(indiaInflationData).reverse();
+            
+            years.forEach(year => {
+                const rate = indiaInflationData[year];
+                const decade = Math.floor(parseInt(year) / 10) * 10 + 's';
+                const period = getEconomicPeriod(year);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${year}</td>
+                    <td>${rate.toFixed(1)}%</td>
+                    <td>${decade}</td>
+                    <td>${period}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function getTrend(year) {
+            const currentRate = indiaInflationData[year];
+            const prevYear = (parseInt(year) - 1).toString();
+            
+            if (!indiaInflationData[prevYear]) return '→';
+            
+            const prevRate = indiaInflationData[prevYear];
+            const diff = currentRate - prevRate;
+            
+            if (diff > 0.5) return '📈 Rising';
+            if (diff < -0.5) return '📉 Falling';
+            return '→ Stable';
+        }
+        
+        function getEconomicContext(year, rate) {
+            const y = parseInt(year);
+            
+            if (y >= 2020) return 'Post-COVID Recovery';
+            if (y >= 2016) return 'Demonetization Era';
+            if (y >= 2014) return 'Modi Government';
+            if (y >= 2008) return 'Global Financial Crisis Impact';
+            if (y >= 2004) return 'UPA Government';
+            if (y >= 1991) return 'Economic Liberalization';
+            if (y >= 1980) return 'License Raj Era';
+            if (y >= 1970) return 'Oil Crisis Period';
+            return 'Early Independence';
+        }
+        
+        function getEconomicPeriod(year) {
+            const y = parseInt(year);
+            
+            if (y >= 2020) return 'COVID & Recovery';
+            if (y >= 2014) return 'Digital India Era';
+            if (y >= 2008) return 'Global Crisis Era';
+            if (y >= 1991) return 'Liberalization Era';
+            if (y >= 1980) return 'License Raj';
+            if (y >= 1970) return 'Oil Crisis Era';
+            return 'Early Independence';
+        }
+        
+        // Theme toggle function (same as main page)
+        function toggleTheme() { 
+            const isLight = document.body.classList.toggle('light'); 
+            try {
+                localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            } catch(e) {}
+        }
+
+        // Apply saved theme
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                const saved = localStorage.getItem('theme');
+                if (saved === 'light') { 
+                    document.body.classList.add('light'); 
+                } else { 
+                    document.body.classList.remove('light'); 
+                }
+            } catch(e) { /* ignore */ }
+        }, { once: true });
+    </script>
+</body>
+</html>

@@ -53,6 +53,35 @@ function calcFD(){
     start = end;
   }
   document.getElementById('fd_schedule').innerHTML = buildTable(headers, rows);
+  
+  // Generate chart
+  const chartContainer = document.getElementById('fd_chart_container');
+  chartContainer.style.display = 'block';
+  
+  const chartLabels = [];
+  const balanceData = [];
+  const interestData = [];
+  
+  let balance = P;
+  chartLabels.push('Start');
+  balanceData.push(P);
+  interestData.push(0);
+  
+  for(let y = 1; y <= Math.round(years); y++){
+    const newBalance = balance * Math.pow(1 + r/n, n);
+    const yearInterest = newBalance - balance;
+    
+    chartLabels.push(`Year ${y}`);
+    balanceData.push(newBalance);
+    interestData.push(yearInterest);
+    
+    balance = newBalance;
+  }
+  
+  createBarChart('fd_chart', chartLabels, [
+    { label: 'Balance', data: balanceData },
+    { label: 'Interest Earned', data: interestData }
+  ], 'Fixed Deposit Growth Over Time');
 }
 
 // ===== RD =====
@@ -78,6 +107,35 @@ function calcRD(){
       <div><span class="v">${fmtMoney(interest)}</span><span class="l">Total Interest</span></div>
     </div>`;
   document.getElementById('rd_schedule').innerHTML = buildTable(["Month","Deposit","Interest","End Balance"], rows);
+  
+  // Generate chart
+  const chartContainer = document.getElementById('rd_chart_container');
+  chartContainer.style.display = 'block';
+  
+  const chartLabels = [];
+  const balanceData = [];
+  const depositData = [];
+  
+  let balance = 0;
+  let totalDeposits = 0;
+  
+  // Show data every 6 months for better readability
+  for(let m = 6; m <= months; m += 6){
+    balance = 0;
+    for(let k = 1; k <= m; k++){
+      balance = balance * (1 + im) + R;
+    }
+    totalDeposits = R * m;
+    
+    chartLabels.push(`Month ${m}`);
+    balanceData.push(balance);
+    depositData.push(totalDeposits);
+  }
+  
+  createLineChart('rd_chart', chartLabels, [
+    { label: 'Maturity Value', data: balanceData },
+    { label: 'Total Deposits', data: depositData }
+  ], 'Recurring Deposit Growth Over Time');
 }
 
 // ===== SIP =====
@@ -105,6 +163,38 @@ function calcSIP(){
       <div><span class="v">${fmtMoney(gains)}</span><span class="l">Estimated Gains</span></div>
     </div>`;
   document.getElementById('sip_schedule').innerHTML = buildTable(["Month","Contribution","Interest","End Balance"], rows);
+  
+  // Generate chart
+  const chartContainer = document.getElementById('sip_chart_container');
+  chartContainer.style.display = 'block';
+  
+  const chartLabels = [];
+  const balanceData = [];
+  const investedData = [];
+  
+  let balance = 0;
+  let totalInvested = 0;
+  
+  for(let y = 1; y <= Math.round(years); y++){
+    const monthsInYear = Math.min(12, n - (y-1)*12);
+    
+    for(let m = 1; m <= monthsInYear; m++){
+      if(timing==="start") balance += P;
+      const before = balance;
+      balance = balance * (1+r);
+      if(timing==="end") balance += P;
+      totalInvested += P;
+    }
+    
+    chartLabels.push(`Year ${y}`);
+    balanceData.push(balance);
+    investedData.push(totalInvested);
+  }
+  
+  createLineChart('sip_chart', chartLabels, [
+    { label: 'Portfolio Value', data: balanceData },
+    { label: 'Total Invested', data: investedData }
+  ], 'SIP Growth Over Time');
 }
 
 // ===== Lumpsum =====
@@ -126,6 +216,34 @@ function calcLumpsum(){
     rows.push([y, fmtMoney(bal-before), fmtMoney(bal)]);
   }
   document.getElementById('ls_schedule').innerHTML = buildTable(["Year","Interest","End Balance"], rows);
+  
+  // Generate chart
+  const chartContainer = document.getElementById('ls_chart_container');
+  chartContainer.style.display = 'block';
+  
+  const chartLabels = [];
+  const balanceData = [];
+  const principalData = [];
+  
+  let balance = P;
+  chartLabels.push('Start');
+  balanceData.push(P);
+  principalData.push(P);
+  
+  for(let y = 1; y <= Math.round(years); y++){
+    const newBalance = balance * Math.pow(1 + i, 12);
+    
+    chartLabels.push(`Year ${y}`);
+    balanceData.push(newBalance);
+    principalData.push(P);
+    
+    balance = newBalance;
+  }
+  
+  createLineChart('ls_chart', chartLabels, [
+    { label: 'Investment Value', data: balanceData },
+    { label: 'Principal', data: principalData }
+  ], 'Lumpsum Investment Growth Over Time');
 }
 
 // ===== SWP =====
@@ -158,6 +276,41 @@ function calcSWP(){
     </div>`;
   if(depletedEarly){ showWarning("Corpus depleted before chosen tenure. Reduce withdrawal or tenure.", "swp_result"); }
   document.getElementById('swp_schedule').innerHTML = buildTable(["Month","Start","Growth","Withdrawal","End"], rows);
+  
+  // Generate chart
+  const chartContainer = document.getElementById('swp_chart_container');
+  chartContainer.style.display = 'block';
+  
+  const chartLabels = [];
+  const balanceData = [];
+  const withdrawalData = [];
+  
+  let currentCorpus = clampNum(document.getElementById('swp_corpus').value);
+  let totalWithdrawn = 0;
+  
+  // Show data every 12 months for better readability
+  for(let y = 1; y <= Math.min(years, 20); y++){
+    for(let m = 1; m <= 12; m++){
+      const growth = currentCorpus * r;
+      currentCorpus = currentCorpus + growth - w;
+      totalWithdrawn += w;
+      if(currentCorpus <= 0) {
+        currentCorpus = 0;
+        break;
+      }
+    }
+    
+    chartLabels.push(`Year ${y}`);
+    balanceData.push(Math.max(0, currentCorpus));
+    withdrawalData.push(totalWithdrawn);
+    
+    if(currentCorpus <= 0) break;
+  }
+  
+  createLineChart('swp_chart', chartLabels, [
+    { label: 'Remaining Corpus', data: balanceData },
+    { label: 'Total Withdrawn', data: withdrawalData }
+  ], 'SWP Corpus Depletion Over Time');
 }
 
 // ===== EMI =====
@@ -193,6 +346,49 @@ function calcEMI(){
 
   const headers = ["Month","EMI","Principal","Interest","Balance"];
   document.getElementById('emi_schedule').innerHTML = buildTable(headers, rows);
+  
+  // Generate chart
+  const chartContainer = document.getElementById('emi_chart_container');
+  chartContainer.style.display = 'block';
+  
+  const chartLabels = [];
+  const balanceData = [];
+  const principalData = [];
+  const interestData = [];
+  
+  let currentBalance = P;
+  let cumulativePrincipal = 0;
+  let cumulativeInterest = 0;
+  
+  // Show data every 12 months for better readability
+  for(let y = 1; y <= Math.round(years); y++){
+    let yearPrincipal = 0;
+    let yearInterest = 0;
+    
+    for(let m = 1; m <= 12 && currentBalance > 0; m++){
+      const interest = currentBalance * i;
+      const principal = Math.min(EMI - interest, currentBalance);
+      currentBalance = Math.max(0, currentBalance - principal);
+      
+      yearPrincipal += principal;
+      yearInterest += interest;
+    }
+    
+    cumulativePrincipal += yearPrincipal;
+    cumulativeInterest += yearInterest;
+    
+    chartLabels.push(`Year ${y}`);
+    balanceData.push(currentBalance);
+    principalData.push(cumulativePrincipal);
+    interestData.push(cumulativeInterest);
+    
+    if(currentBalance <= 0) break;
+  }
+  
+  createLineChart('emi_chart', chartLabels, [
+    { label: 'Outstanding Balance', data: balanceData },
+    { label: 'Principal Paid', data: principalData }
+  ], 'EMI Loan Repayment Progress');
 }
 
 // ===== NPS =====
@@ -226,6 +422,36 @@ function calcNPS(){
       <div><span class="v">${fmtMoney(estMonthlyPension)}</span><span class="l">Est. Monthly Pension</span></div>
     </div>`;
   document.getElementById('nps_schedule').innerHTML = buildTable(["Year","Contribution","Interest","End Balance"], rows);
+  
+  // Generate chart
+  const chartContainer = document.getElementById('nps_chart_container');
+  chartContainer.style.display = 'block';
+  
+  const chartLabels = [];
+  const corpusData = [];
+  const contributionData = [];
+  
+  let currentCorpus = 0;
+  let currentContrib = clampNum(document.getElementById('nps_contrib').value);
+  let totalContributions = 0;
+  
+  for(let y = 1; y <= years; y++){
+    const before = currentCorpus + currentContrib;
+    const end = before * (1 + r);
+    currentCorpus = end;
+    totalContributions += currentContrib;
+    
+    chartLabels.push(`Year ${y}`);
+    corpusData.push(currentCorpus);
+    contributionData.push(totalContributions);
+    
+    currentContrib *= (1 + step);
+  }
+  
+  createLineChart('nps_chart', chartLabels, [
+    { label: 'NPS Corpus', data: corpusData },
+    { label: 'Total Contributions', data: contributionData }
+  ], 'NPS Corpus Growth Over Time');
 }
 
 // ===== PPF =====
@@ -253,6 +479,34 @@ function calcPPF(){
       <div><span class="v">${fmtMoney(gains)}</span><span class="l">Estimated Interest</span></div>
     </div>`;
   document.getElementById('ppf_schedule').innerHTML = buildTable(["Year","Deposit","Interest","End Balance"], rows);
+  
+  // Generate chart
+  const chartContainer = document.getElementById('ppf_chart_container');
+  chartContainer.style.display = 'block';
+  
+  const chartLabels = [];
+  const balanceData = [];
+  const depositData = [];
+  
+  let balance = 0;
+  let totalDeposits = 0;
+  
+  for(let y = 1; y <= n; y++){
+    if(timing==="start"){ balance += C; }
+    const before = balance;
+    balance = balance * (1 + r);
+    if(timing==="end"){ balance += C; }
+    totalDeposits += C;
+    
+    chartLabels.push(`Year ${y}`);
+    balanceData.push(balance);
+    depositData.push(totalDeposits);
+  }
+  
+  createLineChart('ppf_chart', chartLabels, [
+    { label: 'PPF Balance', data: balanceData },
+    { label: 'Total Deposits', data: depositData }
+  ], 'PPF Growth Over Time');
 }
 
 // ===== CAGR =====
@@ -276,12 +530,55 @@ function calcInflation(){
   const fv = clampNum(document.getElementById('inf_fv').value);
   const real = (1+nom)/(1+inf) - 1;
   const pv_today = fv / (1+inf);
+  
+  // Get historical inflation data
+  const currentYear = new Date().getFullYear();
+  const recentInflation = getRecentTrends(10);
+  const avgInflation10yr = inflationPeriods["Last 10 years"];
+  const avgInflation20yr = inflationPeriods["Last 20 years"];
+  
   document.getElementById('inflation_result').innerHTML = `
     <div class="kpi">
       <div><span class="v">${fmtPct(real*100)}</span><span class="l">Real Return (approx)</span></div>
       <div><span class="v">${fmtMoney(pv_today)}</span><span class="l">Future Value in Today's Money (1 year)</span></div>
+      <div><span class="v">${fmtPct(avgInflation10yr)}</span><span class="l">Avg India Inflation (Last 10 years)</span></div>
+      <div><span class="v">${fmtPct(avgInflation20yr)}</span><span class="l">Avg India Inflation (Last 20 years)</span></div>
+    </div>
+    
+    <div class="inflation-periods" style="margin-top: 16px; padding: 12px; background: #0e1628; border: 1px solid #243454; border-radius: 12px;">
+      <h4 style="margin: 0 0 8px; color: #e8f0ff;">Historical India Inflation Averages</h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; font-size: 12px;">
+        <div><span style="color: #a8b6d8;">1960-1970:</span> <strong>${fmtPct(inflationPeriods["1960-1970"])}</strong></div>
+        <div><span style="color: #a8b6d8;">1970-1980:</span> <strong>${fmtPct(inflationPeriods["1970-1980"])}</strong></div>
+        <div><span style="color: #a8b6d8;">1980-1990:</span> <strong>${fmtPct(inflationPeriods["1980-1990"])}</strong></div>
+        <div><span style="color: #a8b6d8;">1990-2000:</span> <strong>${fmtPct(inflationPeriods["1990-2000"])}</strong></div>
+        <div><span style="color: #a8b6d8;">2000-2010:</span> <strong>${fmtPct(inflationPeriods["2000-2010"])}</strong></div>
+        <div><span style="color: #a8b6d8;">2010-2020:</span> <strong>${fmtPct(inflationPeriods["2010-2020"])}</strong></div>
+        <div><span style="color: #a8b6d8;">2020-2024:</span> <strong>${fmtPct(inflationPeriods["2020-2024"])}</strong></div>
+        <div><span style="color: #a8b6d8;">Overall:</span> <strong>${fmtPct(inflationPeriods["Overall (1960-2024)"])}</strong></div>
+      </div>
     </div>`;
-  document.getElementById('inflation_schedule').innerHTML = buildTable(["Nominal %","Inflation %","Real %","FV in Today's ₹ (1y)"], [[fmtPct(nom*100), fmtPct(inf*100), fmtPct(real*100), fmtMoney(pv_today)]]);
+  
+  // Build recent inflation table
+  const recentRows = [];
+  for (const [year, rate] of Object.entries(recentInflation)) {
+    recentRows.push([year, fmtPct(rate), fmtMoney(100000 / Math.pow(1 + rate/100, currentYear - parseInt(year)))]);
+  }
+  
+  const mainTable = buildTable(["Nominal %","Inflation %","Real %","FV in Today's ₹ (1y)"], 
+    [[fmtPct(nom*100), fmtPct(inf*100), fmtPct(real*100), fmtMoney(pv_today)]]);
+  
+  const historicalTable = buildTable(["Year","Inflation Rate","₹1 Lakh Today's Value"], recentRows.reverse());
+  
+  document.getElementById('inflation_schedule').innerHTML = `
+    <div style="margin-bottom: 16px;">
+      <h4 style="margin: 0 0 8px; color: #e8f0ff;">Current Calculation</h4>
+      ${mainTable}
+    </div>
+    <div>
+      <h4 style="margin: 0 0 8px; color: #e8f0ff;">Recent India Inflation History (Last 10 Years)</h4>
+      ${historicalTable}
+    </div>`;
 }
 
 // ===== Goal SIP =====
@@ -323,9 +620,77 @@ function calcGoal(){
   );
   const schedule = buildTable(["Month","Contribution","Interest","End Balance"], rows);
   const sc = document.getElementById('goal_schedule'); if(sc) sc.innerHTML = summary + schedule;
+  
+  // Generate chart
+  const chartContainer = document.getElementById('goal_chart_container');
+  chartContainer.style.display = 'block';
+  
+  const chartLabels = [];
+  const balanceData = [];
+  const investedData = [];
+  
+  let balance = 0;
+  let totalInvested = 0;
+  
+  for(let y = 1; y <= Math.round(years); y++){
+    const monthsInYear = Math.min(12, n - (y-1)*12);
+    
+    for(let m = 1; m <= monthsInYear; m++){
+      const before = balance;
+      balance = balance * (1 + r) + sipRounded;
+      totalInvested += sipRounded;
+    }
+    
+    chartLabels.push(`Year ${y}`);
+    balanceData.push(balance);
+    investedData.push(totalInvested);
+  }
+  
+  createLineChart('goal_chart', chartLabels, [
+    { label: 'Goal Progress', data: balanceData },
+    { label: 'Total Invested', data: investedData }
+  ], 'Goal SIP Progress Over Time');
 }
 
-function toggleTheme(){ const isLight=document.body.classList.toggle('light'); try{localStorage.setItem('theme', isLight?'light':'dark');}catch(e){} }
+function toggleTheme(){ 
+  const isLight=document.body.classList.toggle('light'); 
+  try{localStorage.setItem('theme', isLight?'light':'dark');}catch(e){} 
+  
+  // Update all existing charts with new theme colors
+  updateChartsForTheme();
+}
+
+function updateChartsForTheme() {
+  const colors = getThemeColors();
+  
+  // Update all existing chart instances
+  Object.keys(chartInstances).forEach(chartId => {
+    const chart = chartInstances[chartId];
+    if (chart) {
+      // Update chart colors
+      chart.options.plugins.title.color = colors.text;
+      chart.options.plugins.legend.labels.color = colors.text;
+      chart.options.scales.x.ticks.color = colors.text;
+      chart.options.scales.x.grid.color = colors.grid;
+      chart.options.scales.y.ticks.color = colors.text;
+      chart.options.scales.y.grid.color = colors.grid;
+      
+      // Update dataset colors
+      chart.data.datasets.forEach((dataset, index) => {
+        if (chart.config.type === 'bar') {
+          dataset.backgroundColor = index === 0 ? colors.primary + '80' : colors.secondary + '80';
+          dataset.borderColor = index === 0 ? colors.primary : colors.secondary;
+        } else {
+          dataset.borderColor = index === 0 ? colors.primary : colors.secondary;
+          dataset.backgroundColor = index === 0 ? colors.primary + '20' : colors.secondary + '20';
+        }
+      });
+      
+      // Update the chart
+      chart.update();
+    }
+  });
+}
 
 // ===== Super SIP =====
 function calcSuperSIP(){
@@ -447,6 +812,157 @@ function calcSuperSIP(){
   }
   
   document.getElementById('supersip_schedule').innerHTML = buildTable(headers, combinedRows);
+  
+  // Generate chart
+  const chartContainer = document.getElementById('supersip_chart_container');
+  chartContainer.style.display = 'block';
+  
+  const chartLabels = [];
+  const stepupData = [];
+  const fixedData = [];
+  
+  for(let i = 0; i < years; i++){
+    chartLabels.push(`Year ${i + 1}`);
+    // Extract numeric values from formatted strings
+    const stepupBalance = parseFloat(stepupRows[i][4].replace(/[₹,\s]/g, ''));
+    const fixedBalance = parseFloat(fixedRows[i][4].replace(/[₹,\s]/g, ''));
+    stepupData.push(stepupBalance);
+    fixedData.push(fixedBalance);
+  }
+  
+  createLineChart('supersip_chart', chartLabels, [
+    { label: 'Step-up SIP Value', data: stepupData },
+    { label: 'Fixed SIP Value', data: fixedData }
+  ], 'Step-up SIP vs Fixed SIP Comparison');
+}
+
+// ===== Chart Functions =====
+let chartInstances = {};
+
+function destroyChart(chartId) {
+  if (chartInstances[chartId]) {
+    chartInstances[chartId].destroy();
+    delete chartInstances[chartId];
+  }
+}
+
+function getThemeColors() {
+  const isLight = document.body.classList.contains('light');
+  return {
+    primary: isLight ? '#0d6efd' : '#5b9df9',
+    secondary: isLight ? '#dc3545' : '#ff6b6b',
+    success: '#28a745',
+    warning: '#ffc107',
+    danger: '#dc3545',
+    background: isLight ? '#ffffff' : '#121a2b',
+    text: isLight ? '#0d1b2a' : '#e8f0ff',
+    grid: isLight ? '#ced4da' : '#22304d'
+  };
+}
+
+function createBarChart(canvasId, labels, datasets, title) {
+  const colors = getThemeColors();
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  
+  destroyChart(canvasId);
+  
+  chartInstances[canvasId] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: datasets.map((dataset, index) => ({
+        label: dataset.label,
+        data: dataset.data,
+        backgroundColor: index === 0 ? colors.primary + '80' : colors.secondary + '80',
+        borderColor: index === 0 ? colors.primary : colors.secondary,
+        borderWidth: 2,
+        borderRadius: 4
+      }))
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: title,
+          color: colors.text,
+          font: { size: 16, weight: 'bold' }
+        },
+        legend: {
+          labels: { color: colors.text }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: colors.text },
+          grid: { color: colors.grid }
+        },
+        y: {
+          ticks: { 
+            color: colors.text,
+            callback: function(value) {
+              return '₹' + (value / 100000).toFixed(1) + 'L';
+            }
+          },
+          grid: { color: colors.grid }
+        }
+      }
+    }
+  });
+}
+
+function createLineChart(canvasId, labels, datasets, title) {
+  const colors = getThemeColors();
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  
+  destroyChart(canvasId);
+  
+  chartInstances[canvasId] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: datasets.map((dataset, index) => ({
+        label: dataset.label,
+        data: dataset.data,
+        borderColor: index === 0 ? colors.primary : colors.secondary,
+        backgroundColor: index === 0 ? colors.primary + '20' : colors.secondary + '20',
+        borderWidth: 3,
+        fill: true,
+        tension: 0.4
+      }))
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: title,
+          color: colors.text,
+          font: { size: 16, weight: 'bold' }
+        },
+        legend: {
+          labels: { color: colors.text }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: colors.text },
+          grid: { color: colors.grid }
+        },
+        y: {
+          ticks: { 
+            color: colors.text,
+            callback: function(value) {
+              return '₹' + (value / 100000).toFixed(1) + 'L';
+            }
+          },
+          grid: { color: colors.grid }
+        }
+      }
+    }
+  });
 }
 
 // APPLY_SAVED_THEME
