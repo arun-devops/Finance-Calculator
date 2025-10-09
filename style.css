@@ -115,9 +115,288 @@ td:first-child,th:first-child{text-align:left}
 .light .desc strong{color:#0d1b2a !important;font-weight:700}
 .light .pnote{color:#374151 !important;font-weight:500}
 
-@media (max-width: 768px){
-  .comparison-grid{grid-template-columns:1fr}
-  .comparison-advantage{grid-column:1}
+/* Button Group Styles */
+.button-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-secondary {
+  background: #374151;
+  color: #e8f0ff;
+}
+
+.btn-secondary:hover {
+  background: #4b5563;
+}
+
+.light .btn-secondary {
+  background: #6c757d;
+  color: #ffffff;
+}
+
+.light .btn-secondary:hover {
+  background: #5a6268;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    padding: 8px;
+    height: auto;
+    max-width: 100%;
+  }
+  
+  .app-header {
+    padding: 12px;
+    position: relative;
+  }
+  
+  .title {
+    font-size: 20px;
+  }
+  
+  .subtitle {
+    font-size: 11px;
+  }
+  
+  .sidebar {
+    position: relative;
+    min-width: auto;
+    width: 100%;
+    height: auto;
+    margin-bottom: 16px;
+    top: 0;
+  }
+  
+  .content {
+    height: auto;
+    overflow-y: visible;
+    padding-right: 0;
+  }
+  
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .kpi {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .kpi div {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .comparison-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .comparison-advantage {
+    grid-column: 1;
+  }
+  
+  .payout .prow {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+  }
+  
+  .card {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .card h2 {
+    font-size: 18px;
+  }
+  
+  .table-wrap {
+    font-size: 12px;
+    max-height: 300px;
+  }
+  
+  th, td {
+    padding: 6px 4px;
+    font-size: 11px;
+  }
+  
+  .chart-container {
+    height: 300px;
+    padding: 12px;
+  }
+  
+  .theme-toggle {
+    top: 8px;
+    right: 8px;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  
+  .nav-category {
+    margin-bottom: 12px;
+  }
+  
+  .category-header {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+  
+  .sidebar a {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  
+  .section-category-header {
+    padding: 12px;
+    margin: 16px 0 12px 0;
+  }
+  
+  .section-category-header h1 {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 4px;
+  }
+  
+  .app-header {
+    padding: 8px;
+  }
+  
+  .title {
+    font-size: 18px;
+  }
+  
+  .subtitle {
+    font-size: 10px;
+  }
+  
+  .card {
+    padding: 8px;
+    border-radius: 12px;
+  }
+  
+  .card h2 {
+    font-size: 16px;
+  }
+  
+  .desc {
+    font-size: 11px;
+  }
+  
+  input, select {
+    padding: 8px;
+    font-size: 13px;
+  }
+  
+  label {
+    font-size: 11px;
+  }
+  
+  .btn {
+    padding: 10px;
+    font-size: 13px;
+  }
+  
+  .kpi .v {
+    font-size: 16px;
+  }
+  
+  .kpi .l {
+    font-size: 10px;
+  }
+  
+  .payout .prow {
+    grid-template-columns: 1fr;
+  }
+  
+  .payout .prow div {
+    padding: 8px;
+  }
+  
+  .chart-container {
+    height: 250px;
+    padding: 8px;
+  }
+  
+  .table-wrap {
+    max-height: 250px;
+  }
+  
+  th, td {
+    padding: 4px 2px;
+    font-size: 10px;
+  }
+  
+  .comparison-section, .comparison-advantage {
+    padding: 8px;
+  }
+  
+  .comparison-section h3, .comparison-advantage h3 {
+    font-size: 13px;
+  }
+  
+  .sidebar {
+    padding: 8px;
+  }
+  
+  .nav-category {
+    margin-bottom: 8px;
+  }
+  
+  .sidebar a {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+  
+  .section-category-header {
+    padding: 8px;
+  }
+  
+  .section-category-header h1 {
+    font-size: 14px;
+  }
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+  .container {
+    flex-direction: row;
+  }
+  
+  .sidebar {
+    min-width: 200px;
+    width: 200px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+  
+  .content {
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+  
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
 }
 
 /* Chart Styles */
