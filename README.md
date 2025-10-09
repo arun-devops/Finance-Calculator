@@ -1,35 +1,49 @@
 # 🇮🇳 India Finance Calculator Suite
 
-A comprehensive collection of financial calculators specifically designed for Indian investors and financial planning needs. This web-based calculator suite includes 12 specialized financial calculators plus a basic calculator for everyday math operations.
+A comprehensive collection of financial calculators specifically designed for Indian investors and financial planning needs. This web-based calculator suite includes 15 specialized financial calculators with interactive charts, detailed schedules, and mobile-responsive design.
 
 ## 🌟 Features
 
-### Financial Calculators
+### 🏦 Deposits & Savings
 - **Fixed Deposit (FD)** - Calculate maturity amounts with quarterly compounding
-- **Recurring Deposit (RD)** - Monthly deposit calculations with quarterly crediting
-- **SIP (Systematic Investment Plan)** - Mutual fund SIP calculations
+- **Recurring Deposit (RD)** - Monthly deposit calculations with quarterly crediting  
+- **PPF Maturity** - Public Provident Fund calculations with tax benefits
+
+### 📈 Mutual Funds & Investments
+- **SIP (Systematic Investment Plan)** - Mutual fund SIP calculations with charts
 - **Lumpsum Investment** - One-time investment growth projections
 - **SWP (Systematic Withdrawal Plan)** - Retirement withdrawal planning
-- **Loan EMI** - Home, Personal, Car, and Education loan calculations
-- **NPS Corpus & Pension** - National Pension System calculations with annuity
-- **PPF Maturity** - Public Provident Fund calculations
-- **CAGR** - Compound Annual Growth Rate calculator
-- **Inflation & Real Returns** - Inflation-adjusted return calculations
 - **Goal-based SIP** - Target-oriented investment planning
-- **Super SIP** - Step-up vs Fixed SIP comparison (NEW!)
+- **Super SIP** - Step-up vs Fixed SIP comparison with advantage analysis
 
-### Basic Calculator
-- **Full-featured calculator** with percentage, sign toggle, and all basic operations
-- **Keyboard support** for efficient input
-- **Professional interface** matching the finance calculator theme
+### 🏠 Loans
+- **Loan EMI** - Home, Personal, Car, and Education loan calculations
+- **Loan Prepayment Impact** - Calculate savings from prepayments (one-time/annual)
+- **Credit Card EMI vs Full Payment** - Cost comparison with opportunity analysis
+
+### 🏛️ Retirement & Pension  
+- **NPS Corpus & Pension** - National Pension System with annuity calculations
+- **EPF Maturity** - Employee Provident Fund with percentage/fixed contributions
+
+### 📊 Analysis & Tools
+- **CAGR** - Compound Annual Growth Rate calculator
+- **Inflation & Real Returns** - Historical inflation data with real return analysis
+
+### 🔧 Utilities & Resources
+- **Inflation Data Page** - Historical India inflation trends and analysis
+- **Basic Calculator** - Full-featured calculator with keyboard support
 
 ## 🎨 Design Features
 
 - **Dark/Light Theme Toggle** - Switch between themes with persistent preference
-- **Responsive Design** - Works perfectly on desktop, tablet, and mobile devices
-- **Indian Currency Formatting** - Proper ₹ symbol and comma separation
+- **Fully Responsive Design** - Optimized for desktop, tablet, and mobile devices
+- **Interactive Charts** - Visual growth charts using Chart.js for all calculators
+- **Clear Button Functionality** - Reset calculations while preserving default values
+- **Indian Currency Formatting** - Proper ₹ symbol and comma separation (₹1,00,000 format)
 - **Professional UI** - Clean, modern interface with smooth animations
 - **Comprehensive Results** - KPI cards, detailed schedules, and year-by-year breakdowns
+- **Touch-Optimized** - Mobile-friendly buttons and navigation
+- **Categorized Navigation** - Organized sidebar with calculator categories
 
 ## 🚀 Getting Started
 
@@ -39,10 +53,47 @@ A comprehensive collection of financial calculators specifically designed for In
 
 ### Usage
 1. Open `index.html` in your web browser
-2. Navigate through different calculators using the sidebar
-3. Enter your financial parameters
-4. Click "Calculate" to see detailed results
-5. Use the "🧮 Basic Calculator" link for everyday math operations
+2. Navigate through different calculators using the categorized sidebar
+3. Enter your financial parameters (default values provided for quick testing)
+4. Click "Calculate" to see detailed results with interactive charts
+5. Use "Clear" button to reset while keeping default values
+6. Toggle between dark/light themes using the theme button
+7. Access "Inflation Data" page for historical trends
+8. Use the "🧮 Basic Calculator" for everyday math operations
+
+## ✨ Latest Updates & Features
+
+### 🔄 Clear Button Functionality
+- **Smart Reset** - Clear button resets calculations while preserving default input values
+- **User-Friendly** - No need to re-enter common values when testing scenarios
+- **Consistent Experience** - All 15 calculators have working clear functionality
+
+### 📊 Interactive Charts
+- **Visual Growth Charts** - Line and bar charts for all calculators using Chart.js
+- **Theme-Aware** - Charts automatically adapt to dark/light theme
+- **Mobile Optimized** - Responsive chart sizing for all screen sizes
+- **Memory Efficient** - Proper chart cleanup to prevent memory leaks
+
+### 📱 Enhanced Mobile Experience
+- **Fully Responsive** - Optimized layouts for all screen sizes (768px, 480px breakpoints)
+- **Touch-Friendly** - Large buttons and touch targets for mobile devices
+- **Stacked Layouts** - Single-column forms and results on mobile
+- **Landscape Support** - Hybrid layout for landscape mobile viewing
+- **No Horizontal Scroll** - Everything fits within screen width
+
+### 🎯 Advanced Calculators
+- **EPF Calculator** - Supports both percentage-based and fixed contribution modes
+- **Loan Prepayment** - One-time and annual prepayment impact analysis
+- **Credit Card Analysis** - EMI vs full payment with opportunity cost
+- **Super SIP Comparison** - Step-up vs fixed SIP with advantage calculations
+- **Inflation Analysis** - Historical India inflation data with real return calculations
+
+### 🏗️ Technical Improvements
+- **Categorized Navigation** - Organized sidebar with 5 main categories
+- **Button Groups** - Calculate and Clear buttons grouped together
+- **Responsive Grids** - Adaptive layouts that work on all devices
+- **Performance Optimized** - Efficient CSS and JavaScript with no external dependencies
+- **Cross-Browser Compatible** - Works on all modern browsers
 
 ## 📊 Calculator Details
 
