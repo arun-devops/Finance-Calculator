@@ -11,7 +11,7 @@
   <div class='theme-toggle' onclick='toggleTheme()'>🌓 Theme</div>
   <header class="app-header">
     <div class="title">🇮🇳 Finance Calculator Suite</div>
-    <div class="subtitle">FD • RD • SIP • Lumpsum • SWP • EMI • NPS • PPF • CAGR • Inflation • Goal SIP</div>
+    <div class="subtitle">FD • RD • SIP • Lumpsum • SWP • EMI • NPS • PPF • CAGR • Inflation • Goal SIP • Super SIP</div>
   </header>
 
   <div class="container">
@@ -28,6 +28,7 @@
         <a href="#cagr">CAGR</a>
         <a href="#inflation">Inflation & Real Returns</a>
         <a href="#goal">Goal-based SIP</a>
+        <a href="#supersip">Super SIP (Step-up vs Fixed)</a>
       </nav>
     </aside>
 
@@ -187,8 +188,33 @@
         <button class="btn" onclick="calcGoal()">Calculate</button>
         <div id="goal_result" class="result"></div>
         <div id="goal_schedule" class="table-wrap"></div>
-        <p id="calc_disclaimer" class="desc" style="margin-top:8px">Disclaimer: Please note that these calculators are for illustrations only and do not represent actual returns. Stock market does not have a fixed rate of return and it is not possible to predict the rate of return.</p>
       </section>
+
+      <section id="supersip" class="card">
+        <h2>Super SIP (Step-up vs Fixed Comparison)</h2>
+        <p class="desc">Compare step-up SIP (with yearly increase) vs fixed SIP over the same period.</p>
+        <div class="grid">
+          <label>Starting Monthly SIP (₹)<input type="number" id="supersip_amount" value="5000" min="0"></label>
+          <label>Yearly Increase (% p.a.)<input type="number" id="supersip_stepup" value="5" step="0.1" min="0"></label>
+          <label>Expected Return (% p.a.)<input type="number" id="supersip_rate" value="12" step="0.01" min="0"></label>
+          <label>Tenure (years)<input type="number" id="supersip_years" value="25" step="1" min="1"></label>
+        </div>
+        <button class="btn" onclick="calcSuperSIP()">Calculate & Compare</button>
+        <div id="supersip_result" class="result"></div>
+        <div id="supersip_schedule" class="table-wrap"></div>
+      </section>
+
+      <div class="disclaimer-section" style="background: var(--card); border: 1px solid #1e2a44; border-radius: 16px; padding: 16px; margin: 16px 0; text-align: center;">
+        <p class="desc" style="margin: 0; font-weight: 600; color: var(--warn);">
+          <strong>⚠️ DISCLAIMER:</strong> Please note that these calculators are for illustrations only and do not represent actual returns. Stock market does not have a fixed rate of return and it is not possible to predict the rate of return. Always consult with a qualified financial advisor before making investment decisions.
+        </p>
+      </div>
+
+      <div style="text-align: center; margin: 20px 0;">
+        <a href="calculator.html" style="display: inline-block; padding: 12px 24px; background: var(--acc); color: #00102a; text-decoration: none; border-radius: 12px; font-weight: 600; transition: all 0.2s ease;">
+          🧮 Basic Calculator
+        </a>
+      </div>
 
       <footer class="footer">
         <p>Made for India • Educational estimates. Verify rates & terms with your bank / provider.</p>

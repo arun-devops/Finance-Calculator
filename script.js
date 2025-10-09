@@ -327,6 +327,128 @@ function calcGoal(){
 
 function toggleTheme(){ const isLight=document.body.classList.toggle('light'); try{localStorage.setItem('theme', isLight?'light':'dark');}catch(e){} }
 
+// ===== Super SIP =====
+function calcSuperSIP(){
+  const startingSIP = clampNum(document.getElementById('supersip_amount').value);
+  const stepup = clampNum(document.getElementById('supersip_stepup').value)/100;
+  const annual = clampNum(document.getElementById('supersip_rate').value)/100;
+  const years = Math.max(1, parseInt(document.getElementById('supersip_years').value||"1",10));
+  
+  const r = Math.pow(1 + annual, 1/12) - 1; // monthly rate
+  const n = years * 12; // total months
+  
+  // Step-up SIP calculation
+  let stepupBalance = 0;
+  let stepupInvested = 0;
+  let currentSIP = startingSIP;
+  let stepupRows = [];
+  
+  for(let y = 1; y <= years; y++){
+    let yearStartBalance = stepupBalance;
+    let yearInvestment = 0;
+    
+    // Calculate monthly for this year
+    for(let m = 1; m <= 12; m++){
+      const before = stepupBalance;
+      stepupBalance = stepupBalance * (1 + r) + currentSIP;
+      const interest = before * r;
+      yearInvestment += currentSIP;
+      stepupInvested += currentSIP;
+    }
+    
+    stepupRows.push([
+      y, 
+      fmtMoney(currentSIP), 
+      fmtMoney(yearInvestment), 
+      fmtMoney(stepupBalance - yearStartBalance - yearInvestment), 
+      fmtMoney(stepupBalance)
+    ]);
+    
+    // Increase SIP for next year
+    currentSIP = currentSIP * (1 + stepup);
+  }
+  
+  // Fixed SIP calculation (using starting amount for entire period)
+  let fixedBalance = 0;
+  let fixedInvested = startingSIP * n;
+  let fixedRows = [];
+  
+  for(let y = 1; y <= years; y++){
+    let yearStartBalance = fixedBalance;
+    let yearInvestment = startingSIP * 12;
+    
+    // Calculate monthly for this year
+    for(let m = 1; m <= 12; m++){
+      const before = fixedBalance;
+      fixedBalance = fixedBalance * (1 + r) + startingSIP;
+      const interest = before * r;
+    }
+    
+    fixedRows.push([
+      y, 
+      fmtMoney(startingSIP), 
+      fmtMoney(yearInvestment), 
+      fmtMoney(fixedBalance - yearStartBalance - yearInvestment), 
+      fmtMoney(fixedBalance)
+    ]);
+  }
+  
+  const stepupGains = stepupBalance - stepupInvested;
+  const fixedGains = fixedBalance - fixedInvested;
+  const advantage = stepupBalance - fixedBalance;
+  const advantagePct = ((stepupBalance / fixedBalance) - 1) * 100;
+  
+  document.getElementById('supersip_result').innerHTML = `
+    <div class="comparison-grid">
+      <div class="comparison-section">
+        <h3>📈 Step-up SIP (${fmtPct(stepup*100)} yearly increase)</h3>
+        <div class="kpi">
+          <div><span class="v">${fmtMoney(stepupInvested)}</span><span class="l">Total Invested</span></div>
+          <div><span class="v">${fmtMoney(stepupBalance)}</span><span class="l">Final Value</span></div>
+          <div><span class="v">${fmtMoney(stepupGains)}</span><span class="l">Total Gains</span></div>
+        </div>
+      </div>
+      
+      <div class="comparison-section">
+        <h3>📊 Fixed SIP (₹${fmtMoney(startingSIP).replace('₹ ', '')} throughout)</h3>
+        <div class="kpi">
+          <div><span class="v">${fmtMoney(fixedInvested)}</span><span class="l">Total Invested</span></div>
+          <div><span class="v">${fmtMoney(fixedBalance)}</span><span class="l">Final Value</span></div>
+          <div><span class="v">${fmtMoney(fixedGains)}</span><span class="l">Total Gains</span></div>
+        </div>
+      </div>
+      
+      <div class="comparison-advantage">
+        <h3>🚀 Step-up Advantage</h3>
+        <div class="kpi">
+          <div><span class="v">${fmtMoney(advantage)}</span><span class="l">Extra Corpus</span></div>
+          <div><span class="v">${fmtPct(advantagePct)}</span><span class="l">% Better</span></div>
+          <div><span class="v">${fmtMoney(stepupInvested - fixedInvested)}</span><span class="l">Extra Investment</span></div>
+        </div>
+      </div>
+    </div>`;
+  
+  // Combined schedule showing both approaches
+  const headers = ["Year", "Step-up SIP", "Step-up Investment", "Step-up Interest", "Step-up Balance", "Fixed SIP", "Fixed Investment", "Fixed Interest", "Fixed Balance"];
+  let combinedRows = [];
+  
+  for(let i = 0; i < years; i++){
+    combinedRows.push([
+      stepupRows[i][0], // Year
+      stepupRows[i][1], // Step-up SIP
+      stepupRows[i][2], // Step-up Investment
+      stepupRows[i][3], // Step-up Interest
+      stepupRows[i][4], // Step-up Balance
+      fixedRows[i][1], // Fixed SIP
+      fixedRows[i][2], // Fixed Investment
+      fixedRows[i][3], // Fixed Interest
+      fixedRows[i][4]  // Fixed Balance
+    ]);
+  }
+  
+  document.getElementById('supersip_schedule').innerHTML = buildTable(headers, combinedRows);
+}
+
 // APPLY_SAVED_THEME
 window.addEventListener('DOMContentLoaded', () => {
   try{

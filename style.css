@@ -83,3 +83,19 @@ td:first-child,th:first-child{text-align:left}
 .payout .l{font-size:11px;color:#a8b6d8}
 .light .payout .prow div{background:#fff;border-color:#dee2e6}
 .light .payout .l{color:#475569}
+
+/* Super SIP Comparison Styles */
+.comparison-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.comparison-section{background:#0e1628;border:1px solid #243454;border-radius:12px;padding:12px}
+.comparison-section h3{margin:0 0 8px;font-size:14px;color:#e8f0ff}
+.comparison-advantage{grid-column:1/-1;background:#0b1324;border:1px solid #22304d;border-radius:12px;padding:12px}
+.comparison-advantage h3{color:#4caf50;margin:0 0 8px}
+.light .comparison-section{background:#f8f9fa;border-color:#dee2e6}
+.light .comparison-section h3{color:#0d1b2a}
+.light .comparison-advantage{background:#e8f5e8;border-color:#c3e6c3}
+.light .comparison-advantage h3{color:#2e7d32}
+
+@media (max-width: 768px){
+  .comparison-grid{grid-template-columns:1fr}
+  .comparison-advantage{grid-column:1}
+}
