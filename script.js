@@ -713,22 +713,208 @@ function calcCAGR(){
   const S = clampNum(document.getElementById('cagr_start').value);
   const E = clampNum(document.getElementById('cagr_end').value);
   const n = clampNum(document.getElementById('cagr_years').value);
-  if(S<=0 || n<=0){ document.getElementById('cagr_result').innerHTML = "<div class='kpi'><div>Enter valid values.</div></div>"; return; }
+  
+  if(S<=0 || n<=0){ 
+    document.getElementById('cagr_result').innerHTML = "<div class='kpi'><div>Please enter valid values for all fields.</div></div>"; 
+    return; 
+  }
+  
   const c = Math.pow(E/S, 1/n) - 1;
+  const totalGrowth = E - S;
+  const growthMultiple = E / S;
+  const annualizedReturn = c * 100;
+  
+  // Determine performance category
+  let performanceCategory = '';
+  let performanceEmoji = '';
+  let performanceColor = '';
+  
+  if (annualizedReturn >= 15) {
+    performanceCategory = 'Excellent Performance';
+    performanceEmoji = '🚀';
+    performanceColor = '#4caf50';
+  } else if (annualizedReturn >= 12) {
+    performanceCategory = 'Good Performance';
+    performanceEmoji = '📈';
+    performanceColor = '#2196f3';
+  } else if (annualizedReturn >= 8) {
+    performanceCategory = 'Average Performance';
+    performanceEmoji = '📊';
+    performanceColor = '#ff9800';
+  } else if (annualizedReturn >= 0) {
+    performanceCategory = 'Below Average';
+    performanceEmoji = '📉';
+    performanceColor = '#f44336';
+  } else {
+    performanceCategory = 'Loss';
+    performanceEmoji = '⚠️';
+    performanceColor = '#d32f2f';
+  }
+  
+  // Calculate what ₹1,00,000 would become
+  const exampleAmount = 100000;
+  const exampleFinalValue = exampleAmount * Math.pow(1 + c, n);
+  
   document.getElementById('cagr_result').innerHTML = `
-    <div class="kpi">
-      <div><span class="v">${fmtPct(c*100)}</span><span class="l">CAGR</span></div>
+    <div class="growth-rate-summary" style="background: var(--success-bg, #e8f5e8); border: 2px solid ${performanceColor}; border-radius: 16px; padding: 20px; margin: 16px 0;">
+      <h3 style="margin: 0 0 16px; color: ${performanceColor}; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span>${performanceEmoji}</span> Your Investment Growth Rate
+      </h3>
+      
+      <div class="growth-highlight" style="text-align: center; margin-bottom: 16px;">
+        <div style="font-size: 36px; font-weight: bold; color: ${performanceColor}; margin-bottom: 8px;">
+          ${fmtPct(annualizedReturn)}
+        </div>
+        <div style="font-size: 18px; color: var(--text); font-weight: 600;">
+          ${performanceCategory}
+        </div>
+        <div style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">
+          Annual Growth Rate (CAGR)
+        </div>
+      </div>
+      
+      <div class="growth-comparison" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+        <div style="text-align: center; padding: 12px; background: var(--card); border-radius: 12px; border: 1px solid ${performanceColor};">
+          <div style="font-size: 20px; font-weight: bold; color: var(--text);">${fmtMoney(S)}</div>
+          <div style="font-size: 14px; color: var(--text-secondary);">You invested</div>
+          <div style="font-size: 12px; color: var(--text-muted);">${n} years ago</div>
+        </div>
+        <div style="text-align: center; padding: 12px; background: var(--card); border-radius: 12px; border: 1px solid ${performanceColor};">
+          <div style="font-size: 20px; font-weight: bold; color: ${performanceColor};">${fmtMoney(E)}</div>
+          <div style="font-size: 14px; color: var(--text-secondary);">Current value</div>
+          <div style="font-size: 12px; color: var(--text-muted);">${growthMultiple.toFixed(1)}x growth</div>
+        </div>
+      </div>
+      
+      <div class="key-insights" style="background: var(--warning-bg, #fff3e0); border-radius: 12px; padding: 12px; border: 1px solid var(--warning, #ffb74d);">
+        <h4 style="margin: 0 0 8px; color: var(--warning-dark, #f57c00); display: flex; align-items: center; gap: 8px;">
+          <span>💡</span> Key Insights
+        </h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 14px; color: #333;">
+          <div><span style="color: #666;">💰 Total Gain/Loss:</span> <strong style="color: #000;">${totalGrowth >= 0 ? '+' : ''}${fmtMoney(totalGrowth)}</strong></div>
+          <div><span style="color: #666;">📈 Growth Multiple:</span> <strong style="color: #000;">${growthMultiple.toFixed(2)}x</strong></div>
+          <div><span style="color: #666;">⏰ Time Period:</span> <strong style="color: #000;">${n} years</strong></div>
+          <div><span style="color: #666;">🎯 Annual Return:</span> <strong style="color: #000;">${fmtPct(annualizedReturn)}</strong></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="simple-examples" style="background: var(--info-bg, #f3e5f5); border-radius: 12px; padding: 16px; margin: 16px 0; border: 1px solid var(--info, #ba68c8);">
+      <h4 style="margin: 0 0 12px; color: var(--info-dark, #7b1fa2); display: flex; align-items: center; gap: 8px;">
+        <span>🧮</span> What This Means
+      </h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; font-size: 14px;">
+        <div style="background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid var(--info-light, #ce93d8);">
+          <div style="font-weight: bold; color: var(--info-dark, #7b1fa2); margin-bottom: 4px;">If you invested ₹1,00,000:</div>
+          <div style="color: var(--text);">• It would become: <strong>${fmtMoney(exampleFinalValue)}</strong></div>
+          <div style="color: var(--text);">• In ${n} years at ${fmtPct(annualizedReturn)} CAGR</div>
+        </div>
+        <div style="background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid var(--info-light, #ce93d8);">
+          <div style="font-weight: bold; color: var(--info-dark, #7b1fa2); margin-bottom: 4px;">Performance vs Benchmarks:</div>
+          <div style="color: var(--text);">• FD (7%): ${annualizedReturn > 7 ? 'Better ✅' : 'Worse ❌'}</div>
+          <div style="color: var(--text);">• Nifty 50 (~12%): ${annualizedReturn > 12 ? 'Better ✅' : 'Worse ❌'}</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="benchmark-comparison" style="background: var(--input-bg); border-radius: 12px; padding: 16px; margin: 16px 0; border: 1px solid var(--border);">
+      <h4 style="margin: 0 0 12px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+        <span>📊</span> How Does This Compare?
+      </h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; font-size: 12px;">
+        <div><span style="color: var(--text-secondary);">Fixed Deposit:</span> <strong style="color: var(--text);">~7% CAGR</strong></div>
+        <div><span style="color: var(--text-secondary);">Nifty 50 (10yr):</span> <strong style="color: var(--text);">~12% CAGR</strong></div>
+        <div><span style="color: var(--text-secondary);">Gold (10yr):</span> <strong style="color: var(--text);">~8% CAGR</strong></div>
+        <div><span style="color: var(--text-secondary);">Real Estate:</span> <strong style="color: var(--text);">~10% CAGR</strong></div>
+      </div>
     </div>`;
-  document.getElementById('cagr_schedule').innerHTML = buildTable(["Start","End","Years","CAGR"], [[fmtMoney(S), fmtMoney(E), n, fmtPct(c*100)]]);
+  
+  // Build detailed table
+  const detailRows = [
+    ["Starting Investment", fmtMoney(S), "Your initial investment amount"],
+    ["Current Value", fmtMoney(E), "What your investment is worth today"],
+    ["Time Period", `${n} years`, "How long you held the investment"],
+    ["Total Growth", `${totalGrowth >= 0 ? '+' : ''}${fmtMoney(totalGrowth)}`, "Absolute gain or loss"],
+    ["Growth Multiple", `${growthMultiple.toFixed(2)}x`, "How many times your money grew"],
+    ["Annual Growth Rate (CAGR)", fmtPct(annualizedReturn), "Steady yearly growth rate"],
+    ["Performance Category", performanceCategory, "How well your investment performed"]
+  ];
+  
+  const detailTable = buildTable(["Metric", "Value", "Explanation"], detailRows);
+  
+  // Build year-by-year projection table
+  const yearlyRows = [];
+  let projectedValue = S;
+  for (let year = 0; year <= Math.min(n, 10); year++) {
+    if (year === 0) {
+      yearlyRows.push([year, fmtMoney(S), "Starting Value", "0%"]);
+    } else {
+      projectedValue = S * Math.pow(1 + c, year);
+      const yearlyGrowth = ((projectedValue / S) - 1) * 100;
+      yearlyRows.push([year, fmtMoney(projectedValue), `After ${year} year${year > 1 ? 's' : ''}`, fmtPct(yearlyGrowth)]);
+    }
+  }
+  
+  if (n > 10) {
+    yearlyRows.push(["...", "...", "...", "..."]);
+    const finalProjected = S * Math.pow(1 + c, n);
+    const finalGrowth = ((finalProjected / S) - 1) * 100;
+    yearlyRows.push([n, fmtMoney(E), `Final Value (${n} years)`, fmtPct(finalGrowth)]);
+  }
+  
+  const yearlyTable = buildTable(["Year", "Investment Value", "Description", "Total Growth %"], yearlyRows);
+  
+  document.getElementById('cagr_schedule').innerHTML = `
+    <div style="margin-bottom: 24px;">
+      <h4 style="margin: 0 0 12px; color: var(--primary);">📊 Investment Analysis Summary</h4>
+      ${detailTable}
+    </div>
+    <div>
+      <h4 style="margin: 0 0 12px; color: var(--primary);">📈 Year-by-Year Growth Projection</h4>
+      ${yearlyTable}
+      <p style="font-size: 12px; color: var(--text-secondary); margin: 8px 0 0; font-style: italic;">
+        💡 This shows how your investment would have grown each year at a steady ${fmtPct(annualizedReturn)} annual rate.
+      </p>
+    </div>`;
+}
+
+// ===== CAGR Preset Functions =====
+function setCAGRPreset(type) {
+  const startEl = document.getElementById('cagr_start');
+  const endEl = document.getElementById('cagr_end');
+  const yearsEl = document.getElementById('cagr_years');
+  
+  switch(type) {
+    case 'nifty':
+      startEl.value = '100000';
+      endEl.value = '310585'; // ~12% CAGR over 10 years
+      yearsEl.value = '10';
+      break;
+    case 'gold':
+      startEl.value = '100000';
+      endEl.value = '215892'; // ~8% CAGR over 10 years
+      yearsEl.value = '10';
+      break;
+    case 'property':
+      startEl.value = '5000000';
+      endEl.value = '12968712'; // ~10% CAGR over 10 years
+      yearsEl.value = '10';
+      break;
+    case 'fd':
+      startEl.value = '100000';
+      endEl.value = '196715'; // ~7% CAGR over 10 years
+      yearsEl.value = '10';
+      break;
+  }
 }
 
 // ===== Inflation =====
 function calcInflation(){
+  const monthlyInvestment = clampNum(document.getElementById('inf_monthly_investment').value);
   const nom = clampNum(document.getElementById('inf_nom').value)/100;
   const inf = clampNum(document.getElementById('inf_infl').value)/100;
-  const fv = clampNum(document.getElementById('inf_fv').value);
+  const years = clampNum(document.getElementById('inf_years').value);
   const real = (1+nom)/(1+inf) - 1;
-  const pv_today = fv / (1+inf);
   
   // Get historical inflation data
   const currentYear = new Date().getFullYear();
@@ -736,48 +922,377 @@ function calcInflation(){
   const avgInflation10yr = inflationPeriods["Last 10 years"];
   const avgInflation20yr = inflationPeriods["Last 20 years"];
   
+  // Calculate monthly rates
+  const monthlyNomRate = Math.pow(1 + nom, 1/12) - 1; // Monthly nominal return
+  const monthlyInflationRate = Math.pow(1 + inf, 1/12) - 1; // Monthly inflation rate
+  const months = Math.round(years * 12);
+  
+  // Calculate final values
+  let nominalBalance = 0;
+  let totalInvested = 0;
+  
+  // Calculate nominal growth
+  for(let m = 1; m <= months; m++){
+    nominalBalance = nominalBalance * (1 + monthlyNomRate) + monthlyInvestment;
+    totalInvested += monthlyInvestment;
+  }
+  
+  // Calculate real value (adjusted for inflation)
+  const realValue = nominalBalance / Math.pow(1 + inf, years);
+  const inflationImpact = nominalBalance - realValue;
+  const buyingPowerLoss = (inflationImpact / nominalBalance) * 100;
+  
+  // Calculate what ₹100 today will be worth
+  const futureValueOf100 = 100 * Math.pow(1 + inf, years);
+  const buyingPowerOf100 = 100 / Math.pow(1 + inf, years);
+  
+  // Calculate gains vs inflation
+  const realGains = realValue - totalInvested;
+  const nominalGains = nominalBalance - totalInvested;
+  
   document.getElementById('inflation_result').innerHTML = `
-    <div class="kpi">
-      <div><span class="v">${fmtPct(real*100)}</span><span class="l">Real Return (approx)</span></div>
-      <div><span class="v">${fmtMoney(pv_today)}</span><span class="l">Future Value in Today's Money (1 year)</span></div>
-      <div><span class="v">${fmtPct(avgInflation10yr)}</span><span class="l">Avg India Inflation (Last 10 years)</span></div>
-      <div><span class="v">${fmtPct(avgInflation20yr)}</span><span class="l">Avg India Inflation (Last 20 years)</span></div>
+    <div class="money-power-summary" style="background: var(--success-bg, #e8f5e8); border: 2px solid var(--success, #4caf50); border-radius: 16px; padding: 20px; margin: 16px 0;">
+      <h3 style="margin: 0 0 16px; color: var(--success-dark, #2e7d32); text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span>🎯</span> Your Money Power Results
+      </h3>
+      
+      <div class="power-comparison" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+        <div style="text-align: center; padding: 12px; background: var(--card); border-radius: 12px; border: 1px solid var(--success-light, #81c784);">
+          <div style="font-size: 24px; font-weight: bold; color: var(--success-dark, #2e7d32);">${fmtMoney(nominalBalance)}</div>
+          <div style="font-size: 14px; color: var(--text-secondary);">Money you'll have</div>
+          <div style="font-size: 12px; color: var(--text-muted);">(Face value)</div>
+        </div>
+        <div style="text-align: center; padding: 12px; background: var(--card); border-radius: 12px; border: 1px solid var(--success-light, #81c784);">
+          <div style="font-size: 24px; font-weight: bold; color: var(--primary);">${fmtMoney(realValue)}</div>
+          <div style="font-size: 14px; color: var(--text-secondary);">Real buying power</div>
+          <div style="font-size: 12px; color: var(--text-muted);">(Today's value)</div>
+        </div>
+      </div>
+      
+      <div class="key-insights" style="background: var(--warning-bg, #fff3e0); border-radius: 12px; padding: 12px; border: 1px solid var(--warning, #ffb74d);">
+        <h4 style="margin: 0 0 8px; color: var(--warning-dark, #f57c00); display: flex; align-items: center; gap: 8px;">
+          <span>💡</span> Key Insights
+        </h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 14px; color: #333;">
+          <div><span style="color: #666;">💰 Your Investment:</span> <strong style="color: #000;">${fmtMoney(totalInvested)}</strong></div>
+          <div><span style="color: #666;">📈 Investment Gains:</span> <strong style="color: #000;">${fmtMoney(nominalGains)}</strong></div>
+          <div><span style="color: #666;">📉 Inflation Impact:</span> <strong style="color: #000;">-${fmtMoney(inflationImpact)}</strong></div>
+          <div><span style="color: #666;">🎯 Real Gains:</span> <strong style="color: #000;">${fmtMoney(realGains)}</strong></div>
+          <div><span style="color: #666;">⚡ Real Return Rate:</span> <strong style="color: #000;">${fmtPct(real*100)}</strong></div>
+          <div><span style="color: #666;">📊 Buying Power Loss:</span> <strong style="color: #000;">${fmtPct(buyingPowerLoss)}</strong></div>
+        </div>
+      </div>
     </div>
     
-    <div class="inflation-periods" style="margin-top: 16px; padding: 12px; background: #0e1628; border: 1px solid #243454; border-radius: 12px;">
-      <h4 style="margin: 0 0 8px; color: #e8f0ff;">Historical India Inflation Averages</h4>
+    <div class="simple-examples" style="background: var(--info-bg, #f3e5f5); border-radius: 12px; padding: 16px; margin: 16px 0; border: 1px solid var(--info, #ba68c8);">
+      <h4 style="margin: 0 0 12px; color: var(--info-dark, #7b1fa2); display: flex; align-items: center; gap: 8px;">
+        <span>🧮</span> Simple Examples
+      </h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; font-size: 14px;">
+        <div style="background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid var(--info-light, #ce93d8);">
+          <div style="font-weight: bold; color: var(--info-dark, #7b1fa2); margin-bottom: 4px;">Today's ₹100 will become:</div>
+          <div style="color: var(--text);">• Face value: <strong>₹${futureValueOf100.toFixed(0)}</strong></div>
+          <div style="color: var(--text);">• Buying power: <strong>₹${buyingPowerOf100.toFixed(0)}</strong></div>
+        </div>
+        <div style="background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid var(--info-light, #ce93d8);">
+          <div style="font-weight: bold; color: var(--info-dark, #7b1fa2); margin-bottom: 4px;">What this means:</div>
+          <div style="color: var(--text);">• Your money ${realGains > 0 ? 'grows' : 'shrinks'} in real terms</div>
+          <div style="color: var(--text);">• ${realGains > 0 ? 'Good news!' : 'Need higher returns!'} ${realGains > 0 ? '✅' : '⚠️'}</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="india-inflation-context" style="background: var(--input-bg); border-radius: 12px; padding: 16px; margin: 16px 0; border: 1px solid var(--border);">
+      <h4 style="margin: 0 0 12px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+        <span>🇮🇳</span> India's Inflation History
+      </h4>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; font-size: 12px;">
-        <div><span style="color: #a8b6d8;">1960-1970:</span> <strong>${fmtPct(inflationPeriods["1960-1970"])}</strong></div>
-        <div><span style="color: #a8b6d8;">1970-1980:</span> <strong>${fmtPct(inflationPeriods["1970-1980"])}</strong></div>
-        <div><span style="color: #a8b6d8;">1980-1990:</span> <strong>${fmtPct(inflationPeriods["1980-1990"])}</strong></div>
-        <div><span style="color: #a8b6d8;">1990-2000:</span> <strong>${fmtPct(inflationPeriods["1990-2000"])}</strong></div>
-        <div><span style="color: #a8b6d8;">2000-2010:</span> <strong>${fmtPct(inflationPeriods["2000-2010"])}</strong></div>
-        <div><span style="color: #a8b6d8;">2010-2020:</span> <strong>${fmtPct(inflationPeriods["2010-2020"])}</strong></div>
-        <div><span style="color: #a8b6d8;">2020-2024:</span> <strong>${fmtPct(inflationPeriods["2020-2024"])}</strong></div>
-        <div><span style="color: #a8b6d8;">Overall:</span> <strong>${fmtPct(inflationPeriods["Overall (1960-2024)"])}</strong></div>
+        <div><span style="color: var(--text-secondary);">Last 10 years:</span> <strong style="color: var(--text);">${fmtPct(avgInflation10yr)}</strong></div>
+        <div><span style="color: var(--text-secondary);">Last 20 years:</span> <strong style="color: var(--text);">${fmtPct(avgInflation20yr)}</strong></div>
+        <div><span style="color: var(--text-secondary);">2020-2024:</span> <strong style="color: var(--text);">${fmtPct(inflationPeriods["2020-2024"])}</strong></div>
+        <div><span style="color: var(--text-secondary);">Overall (1960-2024):</span> <strong style="color: var(--text);">${fmtPct(inflationPeriods["Overall (1960-2024)"])}</strong></div>
       </div>
     </div>`;
   
-  // Build recent inflation table
+  // Build simplified table
+  const summaryRows = [
+    ["Your Monthly Investment", fmtMoney(monthlyInvestment), "Amount you invest each month"],
+    ["Investment Period", `${years} years`, "How long you invest"],
+    ["Expected Return Rate", fmtPct(nom*100), "What your investment might earn"],
+    ["Inflation Rate Used", fmtPct(inf*100), "Expected price increase rate"],
+    ["Total Money Invested", fmtMoney(totalInvested), "All your contributions"],
+    ["Money Value (Face)", fmtMoney(nominalBalance), "What you'll see in your account"],
+    ["Real Buying Power", fmtMoney(realValue), "What it can actually buy (today's terms)"],
+    ["Real Return Rate", fmtPct(real*100), "Your actual earning power after inflation"]
+  ];
+  
+  const summaryTable = buildTable(["What", "Value", "Meaning"], summaryRows);
+  
+  // Build recent inflation reference
   const recentRows = [];
-  for (const [year, rate] of Object.entries(recentInflation)) {
-    recentRows.push([year, fmtPct(rate), fmtMoney(100000 / Math.pow(1 + rate/100, currentYear - parseInt(year)))]);
+  const recentYears = Object.keys(recentInflation).sort().reverse().slice(0, 5);
+  for (const year of recentYears) {
+    const rate = recentInflation[year];
+    const impact = `₹100 → ₹${(100 / Math.pow(1 + rate/100, currentYear - parseInt(year))).toFixed(0)}`;
+    recentRows.push([year, fmtPct(rate), impact]);
   }
   
-  const mainTable = buildTable(["Nominal %","Inflation %","Real %","FV in Today's ₹ (1y)"], 
-    [[fmtPct(nom*100), fmtPct(inf*100), fmtPct(real*100), fmtMoney(pv_today)]]);
-  
-  const historicalTable = buildTable(["Year","Inflation Rate","₹1 Lakh Today's Value"], recentRows.reverse());
+  const historicalTable = buildTable(["Year", "Inflation Rate", "₹100 Today's Value"], recentRows);
   
   document.getElementById('inflation_schedule').innerHTML = `
-    <div style="margin-bottom: 16px;">
-      <h4 style="margin: 0 0 8px; color: #e8f0ff;">Current Calculation</h4>
-      ${mainTable}
+    <div style="margin-bottom: 24px;">
+      <h4 style="margin: 0 0 12px; color: var(--primary);">📊 Your Calculation Summary</h4>
+      ${summaryTable}
     </div>
     <div>
-      <h4 style="margin: 0 0 8px; color: #e8f0ff;">Recent India Inflation History (Last 10 Years)</h4>
+      <h4 style="margin: 0 0 12px; color: var(--primary);">📈 Recent India Inflation (For Reference)</h4>
       ${historicalTable}
+      <p style="font-size: 12px; color: var(--text-secondary); margin: 8px 0 0; font-style: italic;">
+        💡 Tip: If inflation was ${fmtPct(recentInflation[recentYears[0]])} in ${recentYears[0]}, then ₹100 from ${recentYears[0]} has the buying power of ₹${(100 / Math.pow(1 + recentInflation[recentYears[0]]/100, currentYear - parseInt(recentYears[0]))).toFixed(0)} today.
+      </p>
     </div>`;
+}
+
+// ===== Inflation Preset Functions =====
+function setInflationPreset(type) {
+  const monthlyInvestmentEl = document.getElementById('inf_monthly_investment');
+  const nomEl = document.getElementById('inf_nom');
+  const inflEl = document.getElementById('inf_infl');
+  const yearsEl = document.getElementById('inf_years');
+  
+  // Keep current investment amount and years, just change returns
+  const currentInvestment = monthlyInvestmentEl.value || '10000';
+  const currentYears = yearsEl.value || '10';
+  
+  switch(type) {
+    case 'conservative':
+      nomEl.value = '8';
+      inflEl.value = '6';
+      break;
+    case 'moderate':
+      nomEl.value = '12';
+      inflEl.value = '6';
+      break;
+    case 'aggressive':
+      nomEl.value = '15';
+      inflEl.value = '6';
+      break;
+  }
+  
+  // Keep the current investment and years
+  monthlyInvestmentEl.value = currentInvestment;
+  yearsEl.value = currentYears;
+}
+
+// ===== SIP + Hold Strategy =====
+function calcSIPHold(){
+  const sipAmount = clampNum(document.getElementById('siphold_amount').value);
+  const sipYears = clampNum(document.getElementById('siphold_sip_years').value);
+  const holdYears = clampNum(document.getElementById('siphold_hold_years').value);
+  const annual = clampNum(document.getElementById('siphold_rate').value)/100;
+  const r = Math.pow(1 + annual, 1/12) - 1; // monthly rate
+  
+  const totalYears = sipYears + holdYears;
+  const sipMonths = Math.round(sipYears * 12);
+  
+  // Phase 1: SIP Investment Phase
+  let sipBalance = 0;
+  let totalInvested = 0;
+  let sipRows = [];
+  
+  for(let m = 1; m <= sipMonths; m++){
+    const before = sipBalance;
+    sipBalance = sipBalance * (1 + r) + sipAmount;
+    const interest = before * r;
+    totalInvested += sipAmount;
+    
+    // Add to schedule every 12 months for readability
+    if(m % 12 === 0 || m === sipMonths){
+      const year = Math.ceil(m / 12);
+      sipRows.push([
+        `Year ${year}`,
+        fmtMoney(sipAmount),
+        fmtMoney(sipAmount * 12), // Yearly investment
+        fmtMoney(sipBalance - (totalInvested - sipAmount * 12) - sipBalance + before + interest), // Yearly interest approx
+        fmtMoney(sipBalance),
+        "SIP Phase"
+      ]);
+    }
+  }
+  
+  const sipPhaseValue = sipBalance;
+  
+  // Phase 2: Hold Phase (no new investments)
+  let holdBalance = sipPhaseValue;
+  let holdRows = [];
+  const holdMonths = Math.round(holdYears * 12);
+  
+  for(let m = 1; m <= holdMonths; m++){
+    const before = holdBalance;
+    holdBalance = holdBalance * (1 + r);
+    const interest = holdBalance - before;
+    
+    // Add to schedule every 12 months
+    if(m % 12 === 0 || m === holdMonths){
+      const year = Math.ceil(m / 12) + sipYears;
+      holdRows.push([
+        `Year ${year}`,
+        "₹ 0",
+        "₹ 0", // No new investment
+        fmtMoney(interest * 12), // Yearly interest approx
+        fmtMoney(holdBalance),
+        "Hold Phase"
+      ]);
+    }
+  }
+  
+  const finalValue = holdBalance;
+  const totalGains = finalValue - totalInvested;
+  const sipPhaseGains = sipPhaseValue - totalInvested;
+  const holdPhaseGains = finalValue - sipPhaseValue;
+  
+  // Display results
+  document.getElementById('siphold_result').innerHTML = `
+    <div class="comparison-grid">
+      <div class="comparison-section">
+        <h3>📊 Phase 1: SIP Investment (${sipYears} years)</h3>
+        <div class="kpi">
+          <div><span class="v">${fmtMoney(totalInvested)}</span><span class="l">Total Invested</span></div>
+          <div><span class="v">${fmtMoney(sipPhaseValue)}</span><span class="l">Value at End of SIP</span></div>
+          <div><span class="v">${fmtMoney(sipPhaseGains)}</span><span class="l">SIP Phase Gains</span></div>
+        </div>
+      </div>
+      
+      <div class="comparison-section">
+        <h3>🏛️ Phase 2: Hold Period (${holdYears} years)</h3>
+        <div class="kpi">
+          <div><span class="v">₹ 0</span><span class="l">Additional Investment</span></div>
+          <div><span class="v">${fmtMoney(finalValue)}</span><span class="l">Final Maturity Value</span></div>
+          <div><span class="v">${fmtMoney(holdPhaseGains)}</span><span class="l">Hold Phase Gains</span></div>
+        </div>
+      </div>
+      
+      <div class="comparison-advantage">
+        <h3>🎯 Final Results (${totalYears} years total)</h3>
+        <div class="kpi">
+          <div><span class="v">${fmtMoney(finalValue)}</span><span class="l">Total Maturity Value</span></div>
+          <div><span class="v">${fmtMoney(totalInvested)}</span><span class="l">Total Investment</span></div>
+          <div><span class="v">${fmtMoney(totalGains)}</span><span class="l">Total Gains</span></div>
+          <div><span class="v">${fmtPct((totalGains/totalInvested)*100)}</span><span class="l">Total Return %</span></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="strategy-breakdown" style="margin-top: 16px; padding: 12px; background: var(--input-bg); border-radius: 12px;">
+      <h4 style="margin: 0 0 8px; color: var(--primary);">💡 Strategy Breakdown</h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; font-size: 14px;">
+        <div><span style="color: var(--text-secondary);">Monthly SIP:</span> <strong>${fmtMoney(sipAmount)}</strong></div>
+        <div><span style="color: var(--text-secondary);">SIP Duration:</span> <strong>${sipYears} years</strong></div>
+        <div><span style="color: var(--text-secondary);">Hold Duration:</span> <strong>${holdYears} years</strong></div>
+        <div><span style="color: var(--text-secondary);">Expected Return:</span> <strong>${fmtPct(annual*100)}</strong></div>
+        <div><span style="color: var(--text-secondary);">SIP Phase CAGR:</span> <strong>${fmtPct(((Math.pow(sipPhaseValue/totalInvested, 1/sipYears) - 1)*100))}</strong></div>
+        <div><span style="color: var(--text-secondary);">Hold Phase CAGR:</span> <strong>${fmtPct(((Math.pow(finalValue/sipPhaseValue, 1/holdYears) - 1)*100))}</strong></div>
+      </div>
+    </div>`;
+  
+  // Combine both phases for schedule
+  const allRows = [...sipRows, ...holdRows];
+  document.getElementById('siphold_schedule').innerHTML = buildTable(
+    ["Period", "Monthly SIP", "Yearly Investment", "Yearly Interest", "Balance", "Phase"], 
+    allRows
+  );
+  
+  // Monthly-based table - 5 column format
+  let monthlyRows = [];
+  let monthlyBalance = 0;
+  
+  // Phase 1: SIP Investment Phase - Monthly breakdown
+  for(let m = 1; m <= sipMonths; m++){
+    const startBalance = monthlyBalance;
+    const growth = startBalance * r;
+    monthlyBalance = startBalance + growth + sipAmount;
+    
+    monthlyRows.push([
+      m,
+      fmtMoney(startBalance),
+      fmtMoney(growth),
+      fmtMoney(sipAmount),
+      fmtMoney(monthlyBalance)
+    ]);
+  }
+  
+  // Phase 2: Hold Phase - Monthly breakdown
+  const holdMonthsCount = Math.round(holdYears * 12);
+  for(let m = 1; m <= holdMonthsCount; m++){
+    const startBalance = monthlyBalance;
+    const growth = startBalance * r;
+    monthlyBalance = startBalance + growth;
+    
+    monthlyRows.push([
+      sipMonths + m,
+      fmtMoney(startBalance),
+      fmtMoney(growth),
+      "₹ 0", // No contribution in hold phase
+      fmtMoney(monthlyBalance)
+    ]);
+  }
+  
+  // Add monthly table to the schedule - 5 column format
+  const monthlyTable = buildTable(
+    ["Month", "Start (₹)", "Growth (₹)", "Contribution (₹)", "End (₹)"], 
+    monthlyRows
+  );
+  
+  document.getElementById('siphold_schedule').innerHTML = `
+    <div style="margin-bottom: 24px;">
+      <h4 style="margin: 0 0 12px; color: var(--primary);">📊 Yearly Summary</h4>
+      ${buildTable(["Period", "Monthly SIP", "Yearly Investment", "Yearly Interest", "Balance", "Phase"], allRows)}
+    </div>
+    <div>
+      <h4 style="margin: 0 0 12px; color: var(--primary);">📅 Monthly Breakdown</h4>
+      ${monthlyTable}
+    </div>`;
+  
+  // Generate chart
+  const chartContainer = document.getElementById('siphold_chart_container');
+  chartContainer.style.display = 'block';
+  
+  const chartLabels = [];
+  const balanceData = [];
+  const investedData = [];
+  const phaseData = [];
+  
+  let currentBalance = 0;
+  let currentInvested = 0;
+  
+  // SIP Phase data
+  for(let y = 1; y <= sipYears; y++){
+    for(let m = 1; m <= 12; m++){
+      const before = currentBalance;
+      currentBalance = currentBalance * (1 + r) + sipAmount;
+      currentInvested += sipAmount;
+    }
+    chartLabels.push(`Year ${y}`);
+    balanceData.push(currentBalance);
+    investedData.push(currentInvested);
+    phaseData.push('SIP Phase');
+  }
+  
+  // Hold Phase data
+  for(let y = 1; y <= holdYears; y++){
+    for(let m = 1; m <= 12; m++){
+      currentBalance = currentBalance * (1 + r);
+    }
+    chartLabels.push(`Year ${sipYears + y}`);
+    balanceData.push(currentBalance);
+    investedData.push(currentInvested); // No new investment
+    phaseData.push('Hold Phase');
+  }
+  
+  createLineChart('siphold_chart', chartLabels, [
+    { label: 'Portfolio Value', data: balanceData },
+    { label: 'Total Invested', data: investedData }
+  ], 'SIP + Hold Strategy Growth Over Time');
 }
 
 // ===== Goal SIP =====
@@ -1552,14 +2067,202 @@ function clearCAGR(){
   document.getElementById('cagr_schedule').innerHTML = '';
 }
 
+function clearSIPHold(){
+  // Reset to default values instead of clearing
+  document.getElementById('siphold_amount').value = '10000';
+  document.getElementById('siphold_sip_years').value = '5';
+  document.getElementById('siphold_hold_years').value = '10';
+  document.getElementById('siphold_rate').value = '12';
+  // Clear results, charts, and schedules
+  document.getElementById('siphold_result').innerHTML = '';
+  document.getElementById('siphold_schedule').innerHTML = '';
+  const chartContainer = document.getElementById('siphold_chart_container');
+  if(chartContainer) chartContainer.style.display = 'none';
+  destroyChart('siphold_chart');
+}
+
 function clearInflation(){
   // Reset to default values instead of clearing
+  document.getElementById('inf_monthly_investment').value = '10000';
   document.getElementById('inf_nom').value = '12';
   document.getElementById('inf_infl').value = '6';
-  document.getElementById('inf_fv').value = '1000000';
+  document.getElementById('inf_years').value = '10';
   // Clear results and schedules
   document.getElementById('inflation_result').innerHTML = '';
   document.getElementById('inflation_schedule').innerHTML = '';
+}
+
+// ===== Future Value Calculator =====
+function calcFutureValue(){
+  const currentAmount = clampNum(document.getElementById('fv_current_amount').value);
+  const inflationRate = clampNum(document.getElementById('fv_inflation_rate').value)/100;
+  const years = clampNum(document.getElementById('fv_years').value);
+  
+  if(currentAmount <= 0 || years <= 0){ 
+    document.getElementById('future_value_result').innerHTML = "<div class='kpi'><div>Please enter valid values for all fields.</div></div>"; 
+    return; 
+  }
+  
+  // Calculate future value needed to maintain same buying power
+  const futureValue = currentAmount * Math.pow(1 + inflationRate, years);
+  const inflationImpact = futureValue - currentAmount;
+  const buyingPowerLoss = (inflationImpact / futureValue) * 100;
+  
+  // Calculate what different amounts today will be worth
+  const examples = [
+    { current: 10000, future: 10000 * Math.pow(1 + inflationRate, years) },
+    { current: 50000, future: 50000 * Math.pow(1 + inflationRate, years) },
+    { current: 100000, future: 100000 * Math.pow(1 + inflationRate, years) },
+    { current: 500000, future: 500000 * Math.pow(1 + inflationRate, years) }
+  ];
+  
+  document.getElementById('future_value_result').innerHTML = `
+    <div class="future-value-summary" style="background: var(--success-bg, #f3e5f5); border: 2px solid var(--primary, #9c27b0); border-radius: 16px; padding: 20px; margin: 16px 0;">
+      <h3 style="margin: 0 0 16px; color: var(--primary, #7b1fa2); text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span>💰</span> Future Money Value Results
+      </h3>
+      
+      <div class="value-comparison" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+        <div style="text-align: center; padding: 12px; background: var(--card); border-radius: 12px; border: 1px solid var(--primary-light, #ce93d8);">
+          <div style="font-size: 24px; font-weight: bold; color: var(--primary, #7b1fa2);">${fmtMoney(currentAmount)}</div>
+          <div style="font-size: 14px; color: var(--text-secondary);">Today's Value</div>
+          <div style="font-size: 12px; color: var(--text-muted);">What you have now</div>
+        </div>
+        <div style="text-align: center; padding: 12px; background: var(--card); border-radius: 12px; border: 1px solid var(--primary-light, #ce93d8);">
+          <div style="font-size: 24px; font-weight: bold; color: var(--warning-dark, #f57c00);">${fmtMoney(futureValue)}</div>
+          <div style="font-size: 14px; color: var(--text-secondary);">Future Value Needed</div>
+          <div style="font-size: 12px; color: var(--text-muted);">To buy the same things</div>
+        </div>
+      </div>
+      
+      <div class="key-insights" style="background: var(--warning-bg, #fff3e0); border-radius: 12px; padding: 12px; border: 1px solid var(--warning, #ffb74d);">
+        <h4 style="margin: 0 0 8px; color: var(--warning-dark, #f57c00); display: flex; align-items: center; gap: 8px;">
+          <span>💡</span> Key Insights
+        </h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 14px; color: #333;">
+          <div><span style="color: #666;">💸 Inflation Impact:</span> <strong style="color: #000;">+${fmtMoney(inflationImpact)}</strong></div>
+          <div><span style="color: #666;">📉 Buying Power Loss:</span> <strong style="color: #000;">${fmtPct(buyingPowerLoss)}</strong></div>
+          <div><span style="color: #666;">⏰ Time Period:</span> <strong style="color: #000;">${years} years</strong></div>
+          <div><span style="color: #666;">📊 Inflation Rate:</span> <strong style="color: #000;">${fmtPct(inflationRate*100)}</strong></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="simple-examples" style="background: var(--info-bg, #e3f2fd); border-radius: 12px; padding: 16px; margin: 16px 0; border: 1px solid var(--info, #90caf9);">
+      <h4 style="margin: 0 0 12px; color: var(--info-dark, #1565c0); display: flex; align-items: center; gap: 8px;">
+        <span>🧮</span> What Different Amounts Will Need to Become
+      </h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 14px;">
+        ${examples.map(ex => `
+          <div style="background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid var(--info-light, #bbdefb);">
+            <div style="font-weight: bold; color: var(--info-dark, #1565c0); margin-bottom: 4px;">${fmtMoney(ex.current)} today</div>
+            <div style="color: var(--text);">Will need: <strong>${fmtMoney(ex.future)}</strong></div>
+            <div style="color: var(--text-secondary); font-size: 12px;">in ${years} years</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    
+    <div class="planning-tips" style="background: var(--input-bg); border-radius: 12px; padding: 16px; margin: 16px 0; border: 1px solid var(--border);">
+      <h4 style="margin: 0 0 12px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+        <span>🎯</span> Planning Tips
+      </h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; font-size: 14px;">
+        <div style="background: var(--card); padding: 12px; border-radius: 8px;">
+          <div style="font-weight: bold; color: var(--success-dark, #2e7d32); margin-bottom: 4px;">💰 Investment Goal:</div>
+          <div style="color: var(--text);">Your investments should grow to at least <strong>${fmtMoney(futureValue)}</strong> to maintain today's buying power.</div>
+        </div>
+        <div style="background: var(--card); padding: 12px; border-radius: 8px;">
+          <div style="font-weight: bold; color: var(--warning-dark, #f57c00); margin-bottom: 4px;">⚡ Required Return:</div>
+          <div style="color: var(--text);">You need investments that beat <strong>${fmtPct(inflationRate*100)}</strong> inflation to grow your wealth.</div>
+        </div>
+      </div>
+    </div>`;
+  
+  // Build detailed table
+  const detailRows = [
+    ["Current Amount", fmtMoney(currentAmount), "What you have today"],
+    ["Inflation Rate", fmtPct(inflationRate*100), "Expected yearly price increase"],
+    ["Time Period", `${years} years`, "Planning horizon"],
+    ["Future Value Needed", fmtMoney(futureValue), "Amount needed to buy same things"],
+    ["Inflation Impact", fmtMoney(inflationImpact), "How much more you'll need"],
+    ["Buying Power Loss", fmtPct(buyingPowerLoss), "Percentage loss in purchasing power"],
+    ["Annual Growth Needed", fmtPct(inflationRate*100), "Minimum return to beat inflation"]
+  ];
+  
+  const detailTable = buildTable(["Metric", "Value", "Explanation"], detailRows);
+  
+  // Build year-by-year projection table
+  const yearlyRows = [];
+  for (let year = 0; year <= Math.min(years, 15); year++) {
+    const yearlyValue = currentAmount * Math.pow(1 + inflationRate, year);
+    const yearlyImpact = yearlyValue - currentAmount;
+    const yearlyLoss = year === 0 ? 0 : ((yearlyImpact / yearlyValue) * 100);
+    
+    if (year === 0) {
+      yearlyRows.push([year, fmtMoney(currentAmount), "₹ 0", "0%", "Starting Value"]);
+    } else {
+      yearlyRows.push([year, fmtMoney(yearlyValue), fmtMoney(yearlyImpact), fmtPct(yearlyLoss), `After ${year} year${year > 1 ? 's' : ''}`]);
+    }
+  }
+  
+  if (years > 15) {
+    yearlyRows.push(["...", "...", "...", "...", "..."]);
+    const finalValue = currentAmount * Math.pow(1 + inflationRate, years);
+    const finalImpact = finalValue - currentAmount;
+    const finalLoss = ((finalImpact / finalValue) * 100);
+    yearlyRows.push([years, fmtMoney(finalValue), fmtMoney(finalImpact), fmtPct(finalLoss), `Final Value (${years} years)`]);
+  }
+  
+  const yearlyTable = buildTable(["Year", "Value Needed", "Inflation Impact", "Buying Power Loss", "Description"], yearlyRows);
+  
+  document.getElementById('future_value_schedule').innerHTML = `
+    <div style="margin-bottom: 24px;">
+      <h4 style="margin: 0 0 12px; color: var(--primary);">📊 Future Value Analysis</h4>
+      ${detailTable}
+    </div>
+    <div>
+      <h4 style="margin: 0 0 12px; color: var(--primary);">📈 Year-by-Year Impact</h4>
+      ${yearlyTable}
+      <p style="font-size: 12px; color: var(--text-secondary); margin: 8px 0 0; font-style: italic;">
+        💡 This shows how much money you'll need each year to maintain the same buying power as ${fmtMoney(currentAmount)} today.
+      </p>
+    </div>`;
+}
+
+// ===== Future Value Preset Functions =====
+function setFutureValuePreset(type) {
+  const currentAmountEl = document.getElementById('fv_current_amount');
+  const inflationRateEl = document.getElementById('fv_inflation_rate');
+  const yearsEl = document.getElementById('fv_years');
+  
+  switch(type) {
+    case 'retirement':
+      currentAmountEl.value = '1000000'; // 10 lakh today
+      inflationRateEl.value = '6';
+      yearsEl.value = '25';
+      break;
+    case 'child_education':
+      currentAmountEl.value = '500000'; // 5 lakh today
+      inflationRateEl.value = '7'; // Education inflation is typically higher
+      yearsEl.value = '15';
+      break;
+    case 'house_purchase':
+      currentAmountEl.value = '5000000'; // 50 lakh today
+      inflationRateEl.value = '6';
+      yearsEl.value = '10';
+      break;
+  }
+}
+
+function clearFutureValue(){
+  // Reset to default values instead of clearing
+  document.getElementById('fv_current_amount').value = '100000';
+  document.getElementById('fv_inflation_rate').value = '6';
+  document.getElementById('fv_years').value = '10';
+  // Clear results and schedules
+  document.getElementById('future_value_result').innerHTML = '';
+  document.getElementById('future_value_schedule').innerHTML = '';
 }
 
 // APPLY_SAVED_THEME

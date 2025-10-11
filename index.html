@@ -28,6 +28,7 @@
         <div class="nav-category">
           <div class="category-header">📈 Mutual Funds & Investments</div>
           <a href="#sip">SIP (Mutual Funds)</a>
+          <a href="#siphold">SIP + Hold Strategy</a>
           <a href="#lumpsum">Lumpsum Investment</a>
           <a href="#swp">SWP (Systematic Withdrawal)</a>
           <a href="#goal">Goal-based SIP</a>
@@ -49,8 +50,9 @@
         
         <div class="nav-category">
           <div class="category-header">📊 Analysis & Tools</div>
-          <a href="#cagr">CAGR</a>
-          <a href="#inflation">Inflation & Real Returns</a>
+          <a href="#cagr">Investment Growth Rate Calculator</a>
+          <a href="#inflation">Money Power Calculator</a>
+          <a href="#future-value">Future Money Value Calculator</a>
         </div>
         
         <div class="nav-category">
@@ -157,6 +159,26 @@
           <canvas id="sip_chart"></canvas>
         </div>
         <div id="sip_schedule" class="table-wrap"></div>
+      </section>
+
+      <section id="siphold" class="card">
+        <h2>SIP + Hold Strategy Calculator</h2>
+        <p class="desc">Phase 1: Monthly SIP investment. Phase 2: Hold without new investments. Phase 3: Final maturity value.</p>
+        <div class="grid">
+          <label>Monthly SIP Amount (₹)<input type="number" id="siphold_amount" value="10000" min="0"></label>
+          <label>SIP Investment Period (years)<input type="number" id="siphold_sip_years" value="5" step="0.5" min="0.5"></label>
+          <label>Hold Period (years)<input type="number" id="siphold_hold_years" value="10" step="0.5" min="0.5"></label>
+          <label>Expected Return (% p.a.)<input type="number" id="siphold_rate" value="12" step="0.01" min="0"></label>
+        </div>
+        <div class="button-group">
+          <button class="btn" onclick="calcSIPHold()">Calculate Strategy</button>
+          <button class="btn btn-secondary" onclick="clearSIPHold()">Clear</button>
+        </div>
+        <div id="siphold_result" class="result"></div>
+        <div id="siphold_chart_container" class="chart-container" style="display: none;">
+          <canvas id="siphold_chart"></canvas>
+        </div>
+        <div id="siphold_schedule" class="table-wrap"></div>
       </section>
 
       <section id="lumpsum" class="card">
@@ -381,14 +403,46 @@
       </div>
 
       <section id="cagr" class="card">
-        <h2>CAGR (Compound Annual Growth Rate)</h2>
-        <div class="grid">
-          <label>Starting Value (₹)<input type="number" id="cagr_start" value="100000" min="0"></label>
-          <label>Ending Value (₹)<input type="number" id="cagr_end" value="200000" min="0"></label>
-          <label>Years<input type="number" id="cagr_years" value="5" step="0.1" min="0.1"></label>
+        <h2>Investment Growth Rate Calculator</h2>
+        <p class="desc">Find out how well your investments performed! This calculator shows you the yearly growth rate of any investment - whether it's stocks, mutual funds, property, or gold.</p>
+        
+        <div class="cagr-explainer" style="background: linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 100%); border: 1px solid #4caf50; border-radius: 12px; padding: 16px; margin: 16px 0;">
+          <h4 style="margin: 0 0 8px; color: #2e7d32; display: flex; align-items: center; gap: 8px;">
+            What is Growth Rate (CAGR)?
+          </h4>
+          <p style="margin: 0; font-size: 14px; color: #424242; line-height: 1.5;">
+            <strong>Simple Example:</strong> If you invested ₹1,00,000 and it became ₹2,00,000 in 5 years, your money grew at 14.87% per year. 
+            This is called CAGR - it tells you the steady yearly growth rate of your investment.
+          </p>
         </div>
+
+        <div class="grid">
+          <label>How much did you invest initially? (₹)
+            <input type="number" id="cagr_start" value="100000" min="0" placeholder="e.g., 100000">
+            <small style="color: #666; font-size: 12px;">Your starting investment amount</small>
+          </label>
+          <label>What is the current value? (₹)
+            <input type="number" id="cagr_end" value="200000" min="0" placeholder="e.g., 200000">
+            <small style="color: #666; font-size: 12px;">Current market value of your investment today</small>
+          </label>
+          <label>How many years did you hold it?
+            <input type="number" id="cagr_years" value="5" step="0.1" min="0.1" placeholder="e.g., 5">
+            <small style="color: #666; font-size: 12px;">Time period of your investment</small>
+          </label>
+        </div>
+
+        <div class="cagr-presets" style="margin: 16px 0;">
+          <h4 style="margin: 0 0 8px; color: var(--primary);">Quick Examples:</h4>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setCAGRPreset('nifty')">Nifty 50 (10 years)</button>
+            <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setCAGRPreset('gold')">Gold Investment</button>
+            <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setCAGRPreset('property')">Real Estate</button>
+            <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setCAGRPreset('fd')">Fixed Deposit</button>
+          </div>
+        </div>
+
         <div class="button-group">
-          <button class="btn" onclick="calcCAGR()">Calculate</button>
+          <button class="btn" onclick="calcCAGR()">Calculate My Growth Rate</button>
           <button class="btn btn-secondary" onclick="clearCAGR()">Clear</button>
         </div>
         <div id="cagr_result" class="result"></div>
@@ -396,18 +450,111 @@
       </section>
 
       <section id="inflation" class="card">
-        <h2>Inflation & Real Returns</h2>
-        <div class="grid">
-          <label>Nominal Return (% p.a.)<input type="number" id="inf_nom" value="12" step="0.01" min="0"></label>
-          <label>Inflation (% p.a.)<input type="number" id="inf_infl" value="6" step="0.01" min="0"></label>
-          <label>Future Value (₹)<input type="number" id="inf_fv" value="1000000" min="0"></label>
+        <h2>Money Power Calculator</h2>
+        <p class="desc">See how much your money will really be worth in the future! This calculator shows you the real buying power of your investments after considering price increases (inflation).</p>
+        
+        <div class="inflation-explainer" style="background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); border: 1px solid #90caf9; border-radius: 12px; padding: 16px; margin: 16px 0;">
+          <h4 style="margin: 0 0 8px; color: #1565c0; display: flex; align-items: center; gap: 8px;">
+            What is Inflation?
+          </h4>
+          <p style="margin: 0; font-size: 14px; color: #424242; line-height: 1.5;">
+            <strong>Simple Example:</strong> If a cup of tea costs ₹10 today and inflation is 6%, it will cost ₹10.60 next year. 
+            So your ₹100 today will buy only what ₹94 could buy next year. This calculator helps you plan for this!
+          </p>
         </div>
+
+        <div class="car-example" style="background: linear-gradient(135deg, #fff3e0 0%, #fce4ec 100%); border: 1px solid #ff9800; border-radius: 12px; padding: 16px; margin: 16px 0;">
+          <h4 style="margin: 0 0 12px; color: #e65100; display: flex; align-items: center; gap: 8px;">
+            Real Life Example: Car Price Impact
+          </h4>
+          <div style="font-size: 14px; color: #424242; line-height: 1.6;">
+            <p style="margin: 0 0 8px;"><strong>Step 1: Value in 2025</strong><br>
+            Suppose in 2025 you can buy a car for ₹13.6 Lakh. That's today's value (your reference point).</p>
+            
+            <p style="margin: 8px 0;"><strong>Step 2: Effect of Inflation (5% per year)</strong><br>
+            With 5% inflation, prices rise each year. By 2035 (10 years later) the same car will cost:<br>
+            <strong>Future Price = 13.6 × (1.05)^10 ≈ ₹22.2 Lakh</strong></p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <label>How much do you invest monthly? (₹)
+            <input type="number" id="inf_monthly_investment" value="10000" min="0" placeholder="e.g., 10000">
+          </label>
+          <label>What return do you expect? (% per year)
+            <input type="number" id="inf_nom" value="12" step="0.01" min="0" placeholder="e.g., 12">
+            <small style="color: #666; font-size: 12px;">Mutual funds typically give 10-15%</small>
+          </label>
+          <label>Expected price increase rate (% per year)
+            <input type="number" id="inf_infl" value="6" step="0.01" min="0" placeholder="e.g., 6">
+            <small style="color: #666; font-size: 12px;">India's average is around 5-7%</small>
+          </label>
+          <label>For how many years?
+            <input type="number" id="inf_years" value="10" step="0.5" min="0.5" placeholder="e.g., 10">
+          </label>
+        </div>
+
+        <div class="inflation-presets" style="margin: 16px 0;">
+          <h4 style="margin: 0 0 8px; color: var(--primary);">Quick Examples:</h4>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setInflationPreset('conservative')">Conservative (8% return)</button>
+            <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setInflationPreset('moderate')">Moderate (12% return)</button>
+            <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setInflationPreset('aggressive')">Aggressive (15% return)</button>
+          </div>
+        </div>
+
         <div class="button-group">
-          <button class="btn" onclick="calcInflation()">Calculate</button>
+          <button class="btn" onclick="calcInflation()">Calculate My Real Money Power</button>
           <button class="btn btn-secondary" onclick="clearInflation()">Clear</button>
         </div>
         <div id="inflation_result" class="result"></div>
         <div id="inflation_schedule" class="table-wrap"></div>
+      </section>
+
+      <section id="future-value" class="card">
+        <h2>Future Money Value Calculator</h2>
+        <p class="desc">See what your money today will be worth in the future! This calculator shows how much you'll need in the future to buy what you can buy today.</p>
+        
+        <div class="future-value-explainer" style="background: linear-gradient(135deg, #f3e5f5 0%, #e8f5e8 100%); border: 1px solid #9c27b0; border-radius: 12px; padding: 16px; margin: 16px 0;">
+          <h4 style="margin: 0 0 8px; color: #7b1fa2; display: flex; align-items: center; gap: 8px;">
+            How Does Money Lose Value?
+          </h4>
+          <p style="margin: 0; font-size: 14px; color: #424242; line-height: 1.5;">
+            <strong>Simple Example:</strong> ₹1,00,000 today will need to become ₹1,79,085 after 10 years (at 6% inflation) to buy the same things. 
+            This calculator helps you plan how much money you'll actually need in the future!
+          </p>
+        </div>
+
+        <div class="grid">
+          <label>Current Money Value (₹)
+            <input type="number" id="fv_current_amount" value="100000" min="0" placeholder="e.g., 100000">
+            <small style="color: #666; font-size: 12px;">How much money you have today</small>
+          </label>
+          <label>Expected Inflation Rate (% per year)
+            <input type="number" id="fv_inflation_rate" value="6" step="0.01" min="0" placeholder="e.g., 6">
+            <small style="color: #666; font-size: 12px;">India's average is around 5-7%</small>
+          </label>
+          <label>Number of Years
+            <input type="number" id="fv_years" value="10" step="1" min="1" placeholder="e.g., 10">
+            <small style="color: #666; font-size: 12px;">How many years in the future</small>
+          </label>
+        </div>
+
+        <div class="future-value-presets" style="margin: 16px 0;">
+          <h4 style="margin: 0 0 8px; color: var(--primary);">Quick Examples:</h4>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setFutureValuePreset('retirement')">Retirement (25 years)</button>
+            <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setFutureValuePreset('child_education')">Child Education (15 years)</button>
+            <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setFutureValuePreset('house_purchase')">House Purchase (10 years)</button>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button class="btn" onclick="calcFutureValue()">Calculate Future Value</button>
+          <button class="btn btn-secondary" onclick="clearFutureValue()">Clear</button>
+        </div>
+        <div id="future_value_result" class="result"></div>
+        <div id="future_value_schedule" class="table-wrap"></div>
       </section>
 
       <div class="disclaimer-section" style="background: var(--card); border: 1px solid #1e2a44; border-radius: 16px; padding: 16px; margin: 16px 0; text-align: center;">

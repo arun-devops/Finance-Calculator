@@ -26,8 +26,9 @@ A comprehensive collection of financial calculators specifically designed for In
 - **EPF Maturity** - Employee Provident Fund with percentage/fixed contributions
 
 ### 📊 Analysis & Tools
-- **CAGR** - Compound Annual Growth Rate calculator
-- **Inflation & Real Returns** - Historical inflation data with real return analysis
+- **Investment Growth Rate Calculator** - User-friendly CAGR calculator with performance analysis
+- **Money Power Calculator** - Real buying power analysis with inflation impact
+- **Future Money Value Calculator** - Shows what current money will be worth in the future
 
 ### 🔧 Utilities & Resources
 - **Inflation Data Page** - Historical India inflation trends and analysis
@@ -87,6 +88,15 @@ A comprehensive collection of financial calculators specifically designed for In
 - **Credit Card Analysis** - EMI vs full payment with opportunity cost
 - **Super SIP Comparison** - Step-up vs fixed SIP with advantage calculations
 - **Inflation Analysis** - Historical India inflation data with real return calculations
+- **Future Money Value Calculator** - Shows inflation impact on money's buying power over time
+
+### 💰 New Addition: Future Money Value Calculator
+- **Inflation Impact Analysis** - Calculate how much money you'll need in the future
+- **Buying Power Visualization** - See how inflation erodes money's value over time
+- **Planning Scenarios** - Preset examples for retirement, education, and major purchases
+- **Investment Guidance** - Shows minimum returns needed to beat inflation
+- **Year-by-Year Breakdown** - Detailed progression of money's future value
+- **Real-World Examples** - Practical examples with different amounts and timeframes
 
 ### 🏗️ Technical Improvements
 - **Categorized Navigation** - Organized sidebar with 5 main categories
