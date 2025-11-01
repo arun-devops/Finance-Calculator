@@ -31,8 +31,12 @@
           <a href="#siphold">SIP + Hold Strategy</a>
           <a href="#lumpsum">Lumpsum Investment</a>
           <a href="#swp">SWP (Systematic Withdrawal)</a>
+          <a href="#swp-yearly">SWP (Yearly Withdrawal)</a>
+          <a href="#swp-stepup">SWP (Step-up Yearly Withdrawal)</a>
           <a href="#goal">Goal-based SIP</a>
           <a href="#supersip">Super SIP (Step-up vs Fixed)</a>
+          <a href="#supersiphold">Super SIP + Hold Strategy</a>
+          <a href="#childlifecycle">Child Lifecycle Investment</a>
         </div>
         
         <div class="nav-category">
@@ -59,6 +63,7 @@
           <div class="category-header">🔧 Utilities & Resources</div>
           <a href="inflation-data.html">Inflation Data</a>
           <a href="calculator.html">Basic Calculator</a>
+          <a href="loan-closure.html">Loan Closure Checklist</a>
         </div>
       </nav>
     </aside>
@@ -220,6 +225,47 @@
         <div id="swp_schedule" class="table-wrap"></div>
       </section>
 
+      <section id="swp-yearly" class="card">
+        <h2>SWP (Yearly Withdrawal Plan)</h2>
+        <p class="desc">Annual growth, then yearly withdrawal (end of year). Ideal for retirement planning with annual income needs.</p>
+        <div class="grid">
+          <label>Starting Corpus (₹)<input type="number" id="swp_yearly_corpus" value="5000000" min="0"></label>
+          <label>Yearly Withdrawal (₹)<input type="number" id="swp_yearly_withdraw" value="500000" min="0"></label>
+          <label>Expected Return (% p.a.)<input type="number" id="swp_yearly_rate" value="10" step="0.01" min="0"></label>
+          <label>Tenure (years)<input type="number" id="swp_yearly_years" value="25" step="1" min="1"></label>
+        </div>
+        <div class="button-group">
+          <button class="btn" onclick="calcSWPYearly()">Calculate</button>
+          <button class="btn btn-secondary" onclick="clearSWPYearly()">Clear</button>
+        </div>
+        <div id="swp_yearly_result" class="result"></div>
+        <div id="swp_yearly_chart_container" class="chart-container" style="display: none;">
+          <canvas id="swp_yearly_chart"></canvas>
+        </div>
+        <div id="swp_yearly_schedule" class="table-wrap"></div>
+      </section>
+
+      <section id="swp-stepup" class="card">
+        <h2>SWP (Step-up Yearly Withdrawal Plan)</h2>
+        <p class="desc">Inflation-adjusted yearly withdrawal that increases by a percentage each year. Perfect for retirement planning with rising expenses.</p>
+        <div class="grid">
+          <label>Starting Corpus (₹)<input type="number" id="swp_stepup_corpus" value="5000000" min="0"></label>
+          <label>Initial Yearly Withdrawal (₹)<input type="number" id="swp_stepup_withdraw" value="400000" min="0"></label>
+          <label>Yearly Increase in Withdrawal (% p.a.)<input type="number" id="swp_stepup_increase" value="6" step="0.1" min="0"></label>
+          <label>Expected Return (% p.a.)<input type="number" id="swp_stepup_rate" value="10" step="0.01" min="0"></label>
+          <label>Tenure (years)<input type="number" id="swp_stepup_years" value="25" step="1" min="1"></label>
+        </div>
+        <div class="button-group">
+          <button class="btn" onclick="calcSWPStepup()">Calculate Step-up SWP</button>
+          <button class="btn btn-secondary" onclick="clearSWPStepup()">Clear</button>
+        </div>
+        <div id="swp_stepup_result" class="result"></div>
+        <div id="swp_stepup_chart_container" class="chart-container" style="display: none;">
+          <canvas id="swp_stepup_chart"></canvas>
+        </div>
+        <div id="swp_stepup_schedule" class="table-wrap"></div>
+      </section>
+
       <section id="goal" class="card">
         <h2>Goal-based SIP Requirement</h2>
         <p class="desc">Monthly SIP needed to reach a target. Uses effective monthly rate from annual and supports start/end timing.</p>
@@ -257,6 +303,63 @@
           <canvas id="supersip_chart"></canvas>
         </div>
         <div id="supersip_schedule" class="table-wrap"></div>
+      </section>
+
+      <section id="supersiphold" class="card">
+        <h2>Super SIP + Hold Strategy Calculator</h2>
+        <p class="desc">Phase 1: Step-up SIP with yearly increase. Phase 2: Hold without new investments. Compare with regular SIP + Hold strategy.</p>
+        <div class="grid">
+          <label>Starting Monthly SIP (₹)<input type="number" id="supersiphold_amount" value="5000" min="0"></label>
+          <label>Yearly SIP Increase (% p.a.)<input type="number" id="supersiphold_stepup" value="5" step="0.1" min="0"></label>
+          <label>SIP Investment Period (years)<input type="number" id="supersiphold_sip_years" value="15" step="0.5" min="0.5"></label>
+          <label>Hold Period (years)<input type="number" id="supersiphold_hold_years" value="10" step="0.5" min="0.5"></label>
+          <label>Expected Return (% p.a.)<input type="number" id="supersiphold_rate" value="12" step="0.01" min="0"></label>
+        </div>
+        <div class="button-group">
+          <button class="btn" onclick="calcSuperSIPHold()">Calculate Super Strategy</button>
+          <button class="btn btn-secondary" onclick="clearSuperSIPHold()">Clear</button>
+        </div>
+        <div id="supersiphold_result" class="result"></div>
+        <div id="supersiphold_chart_container" class="chart-container" style="display: none;">
+          <canvas id="supersiphold_chart"></canvas>
+        </div>
+        <div id="supersiphold_schedule" class="table-wrap"></div>
+      </section>
+
+      <section id="childlifecycle" class="card">
+        <h2>Child Lifecycle Investment Calculator</h2>
+        <p class="desc">Plan your child's financial future from birth to marriage. One-time investment with strategic withdrawals for education and life milestones over 28 years.</p>
+        
+        <div class="lifecycle-explainer" style="background: linear-gradient(135deg, #e8f5e8 0%, #fff3e0 100%); border: 1px solid #4caf50; border-radius: 12px; padding: 16px; margin: 16px 0;">
+          <h4 style="margin: 0 0 8px; color: #2e7d32; display: flex; align-items: center; gap: 8px;">
+            👶 Child Investment Journey
+          </h4>
+          <div style="font-size: 14px; color: #424242; line-height: 1.6;">
+            <p style="margin: 0 0 8px;"><strong>Years 1-4:</strong> Hold Period - Investment grows without withdrawals</p>
+            <p style="margin: 0 0 8px;"><strong>Years 5-17:</strong> School Education - ₹1,00,000 yearly (LKG to 12th standard)</p>
+            <p style="margin: 0 0 8px;"><strong>Years 18-21:</strong> College Education - ₹5,00,000 yearly (4 years)</p>
+            <p style="margin: 0 0 8px;"><strong>Years 22-23:</strong> Higher Studies - ₹10,00,000 yearly (2 years)</p>
+            <p style="margin: 0;"><strong>Year 28:</strong> Marriage - ₹50,00,000 one-time withdrawal</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <label>Initial Investment at Birth (₹)<input type="number" id="childlifecycle_initial" value="1000000" min="0"></label>
+          <label>Expected Return (% p.a.)<input type="number" id="childlifecycle_rate" value="13" step="0.01" min="0"></label>
+          <label>School Fees (Years 5-17) (₹)<input type="number" id="childlifecycle_school" value="100000" min="0"></label>
+          <label>College Fees (Years 18-21) (₹)<input type="number" id="childlifecycle_college" value="500000" min="0"></label>
+          <label>Higher Studies (Years 22-23) (₹)<input type="number" id="childlifecycle_higher" value="1000000" min="0"></label>
+          <label>Marriage Expense (Year 28) (₹)<input type="number" id="childlifecycle_marriage" value="5000000" min="0"></label>
+        </div>
+        <div class="button-group">
+          <button class="btn" onclick="calcChildLifecycle()">Calculate Child's Financial Journey</button>
+          <button class="btn btn-secondary" onclick="clearChildLifecycle()">Clear</button>
+        </div>
+        <div id="childlifecycle_result" class="result"></div>
+        <div id="childlifecycle_chart_container" class="chart-container" style="display: none;">
+          <canvas id="childlifecycle_chart"></canvas>
+        </div>
+        <div id="childlifecycle_schedule" class="table-wrap"></div>
       </section>
 
       <div class="section-category-header">

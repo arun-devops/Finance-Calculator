@@ -33,6 +33,7 @@ A comprehensive collection of financial calculators specifically designed for In
 ### 🔧 Utilities & Resources
 - **Inflation Data Page** - Historical India inflation trends and analysis
 - **Basic Calculator** - Full-featured calculator with keyboard support
+- **Loan Closure Document Checklist** - Complete guide for all loan types in India
 
 ## 🎨 Design Features
 
@@ -97,6 +98,16 @@ A comprehensive collection of financial calculators specifically designed for In
 - **Investment Guidance** - Shows minimum returns needed to beat inflation
 - **Year-by-Year Breakdown** - Detailed progression of money's future value
 - **Real-World Examples** - Practical examples with different amounts and timeframes
+
+### 📋 New Addition: Loan Closure Document Checklist
+- **Complete Loan Types Coverage** - Home, Vehicle, Gold, Personal, Business/SME, and Education loans
+- **Essential Documents List** - Comprehensive checklist for each loan type with descriptions
+- **Post-Closure Verification** - Important steps like CIBIL updates and document verification
+- **India-Specific Requirements** - MOD cancellation, Form 35, RC updates, and other Indian procedures
+- **Dark/Light Theme Support** - Fully optimized for both theme modes with proper visibility
+- **Mobile-Responsive Design** - Easy-to-use checklist format on all devices
+- **Navigation-Friendly** - Quick jump links to specific loan types
+- **Legal Protection Focus** - Emphasis on documents that protect from future disputes
 
 ### 🏗️ Technical Improvements
 - **Categorized Navigation** - Organized sidebar with 5 main categories
@@ -177,7 +188,10 @@ All calculators are for illustration purposes only and do not represent actual r
 ```
 ├── index.html          # Main finance calculators page
 ├── calculator.html     # Basic calculator page
+├── loan-closure.html   # Loan closure document checklist
+├── inflation-data.html # Historical inflation data and analysis
 ├── script.js          # Financial calculator logic
+├── inflation-data.js   # Inflation data and chart functionality
 ├── style.css          # Styling and themes
 └── README.md          # This file
 ```

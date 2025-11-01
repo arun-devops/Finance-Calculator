@@ -1862,6 +1862,240 @@ function calcCreditCard(){
   );
 }
 
+// ===== SWP Yearly =====
+function calcSWPYearly(){
+  let corpus = clampNum(document.getElementById('swp_yearly_corpus').value);
+  const w = clampNum(document.getElementById('swp_yearly_withdraw').value);
+  const r = clampNum(document.getElementById('swp_yearly_rate').value)/100;
+  const years = Math.max(1, parseInt(document.getElementById('swp_yearly_years').value||"1",10));
+  
+  let yearsSurvived = 0;
+  let rows = [];
+  let depletedEarly = false;
+  
+  for(let y=1; y<=years; y++){
+    const start = corpus;
+    const growth = corpus * r;
+    corpus = corpus + growth;
+    corpus -= w;
+    yearsSurvived = y;
+    rows.push([y, fmtMoney(start), fmtMoney(growth), fmtMoney(w), fmtMoney(Math.max(0, corpus))]);
+    if(corpus <= 0){ corpus = 0; depletedEarly = true; break; }
+  }
+  
+  const totalWithdrawals = w * yearsSurvived;
+  
+  document.getElementById('swp_yearly_result').innerHTML = `
+    <div class="kpi">
+      <div><span class="v">${fmtMoney(w)}</span><span class="l">Yearly Withdrawal</span></div>
+      <div><span class="v">${fmtMoney(totalWithdrawals)}</span><span class="l">Total Withdrawals</span></div>
+      <div><span class="v">${fmtMoney(corpus)}</span><span class="l">Final Value after ${yearsSurvived} years</span></div>
+      <div><span class="v">${depletedEarly ? "Yes" : "No"}</span><span class="l">Depleted?</span></div>
+      <div><span class="v">${yearsSurvived} yrs</span><span class="l">Sustainment</span></div>
+    </div>
+    
+    <div class="swp-yearly-breakdown" style="margin-top: 16px; padding: 12px; background: var(--input-bg); border-radius: 12px;">
+      <h4 style="margin: 0 0 8px; color: var(--primary);">💡 Yearly SWP Analysis</h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; font-size: 14px;">
+        <div><span style="color: var(--text-secondary);">Withdrawal Rate:</span> <strong>${fmtPct((w/clampNum(document.getElementById('swp_yearly_corpus').value))*100)}</strong></div>
+        <div><span style="color: var(--text-secondary);">Expected Return:</span> <strong>${fmtPct(r*100)}</strong></div>
+        <div><span style="color: var(--text-secondary);">Net Growth Rate:</span> <strong>${fmtPct((r*100) - ((w/clampNum(document.getElementById('swp_yearly_corpus').value))*100))}</strong></div>
+        <div><span style="color: var(--text-secondary);">Sustainability:</span> <strong>${depletedEarly ? 'Limited' : 'Sustainable'}</strong></div>
+      </div>
+    </div>`;
+  
+  if(depletedEarly){ 
+    showWarning("Corpus depleted before chosen tenure. Reduce yearly withdrawal or increase corpus.", "swp_yearly_result"); 
+  }
+  
+  document.getElementById('swp_yearly_schedule').innerHTML = buildTable(["Year","Start Balance","Growth","Withdrawal","End Balance"], rows);
+  
+  // Generate chart
+  const chartContainer = document.getElementById('swp_yearly_chart_container');
+  chartContainer.style.display = 'block';
+  
+  const chartLabels = [];
+  const balanceData = [];
+  const withdrawalData = [];
+  
+  let currentCorpus = clampNum(document.getElementById('swp_yearly_corpus').value);
+  let totalWithdrawn = 0;
+  
+  chartLabels.push('Start');
+  balanceData.push(currentCorpus);
+  withdrawalData.push(0);
+  
+  for(let y = 1; y <= Math.min(years, yearsSurvived); y++){
+    const growth = currentCorpus * r;
+    currentCorpus = currentCorpus + growth - w;
+    totalWithdrawn += w;
+    
+    chartLabels.push(`Year ${y}`);
+    balanceData.push(Math.max(0, currentCorpus));
+    withdrawalData.push(totalWithdrawn);
+    
+    if(currentCorpus <= 0) break;
+  }
+  
+  createLineChart('swp_yearly_chart', chartLabels, [
+    { label: 'Remaining Corpus', data: balanceData },
+    { label: 'Total Withdrawn', data: withdrawalData }
+  ], 'SWP Yearly Corpus Depletion Over Time');
+}
+
+function clearSWPYearly(){
+  // Reset to default values instead of clearing
+  document.getElementById('swp_yearly_corpus').value = '5000000';
+  document.getElementById('swp_yearly_withdraw').value = '500000';
+  document.getElementById('swp_yearly_rate').value = '10';
+  document.getElementById('swp_yearly_years').value = '25';
+  // Clear results, charts, and schedules
+  document.getElementById('swp_yearly_result').innerHTML = '';
+  document.getElementById('swp_yearly_schedule').innerHTML = '';
+  const chartContainer = document.getElementById('swp_yearly_chart_container');
+  if(chartContainer) chartContainer.style.display = 'none';
+  destroyChart('swp_yearly_chart');
+}
+
+// ===== SWP Step-up Yearly =====
+function calcSWPStepup(){
+  let corpus = clampNum(document.getElementById('swp_stepup_corpus').value);
+  let currentWithdrawal = clampNum(document.getElementById('swp_stepup_withdraw').value);
+  const increaseRate = clampNum(document.getElementById('swp_stepup_increase').value)/100;
+  const r = clampNum(document.getElementById('swp_stepup_rate').value)/100;
+  const years = Math.max(1, parseInt(document.getElementById('swp_stepup_years').value||"1",10));
+  
+  let yearsSurvived = 0;
+  let rows = [];
+  let depletedEarly = false;
+  let totalWithdrawals = 0;
+  
+  for(let y=1; y<=years; y++){
+    const start = corpus;
+    const growth = corpus * r;
+    corpus = corpus + growth;
+    corpus -= currentWithdrawal;
+    totalWithdrawals += currentWithdrawal;
+    yearsSurvived = y;
+    
+    rows.push([
+      y, 
+      fmtMoney(start), 
+      fmtMoney(growth), 
+      fmtMoney(currentWithdrawal), 
+      fmtMoney(Math.max(0, corpus)),
+      fmtPct(increaseRate*100)
+    ]);
+    
+    if(corpus <= 0){ 
+      corpus = 0; 
+      depletedEarly = true; 
+      break; 
+    }
+    
+    // Increase withdrawal for next year
+    currentWithdrawal = currentWithdrawal * (1 + increaseRate);
+  }
+  
+  const initialWithdrawal = clampNum(document.getElementById('swp_stepup_withdraw').value);
+  const finalWithdrawal = initialWithdrawal * Math.pow(1 + increaseRate, yearsSurvived - 1);
+  const averageWithdrawal = totalWithdrawals / yearsSurvived;
+  
+  document.getElementById('swp_stepup_result').innerHTML = `
+    <div class="kpi">
+      <div><span class="v">${fmtMoney(initialWithdrawal)}</span><span class="l">Initial Yearly Withdrawal</span></div>
+      <div><span class="v">${fmtMoney(finalWithdrawal)}</span><span class="l">Final Yearly Withdrawal</span></div>
+      <div><span class="v">${fmtMoney(totalWithdrawals)}</span><span class="l">Total Withdrawals</span></div>
+      <div><span class="v">${fmtMoney(corpus)}</span><span class="l">Final Corpus Value</span></div>
+      <div><span class="v">${depletedEarly ? "Yes" : "No"}</span><span class="l">Depleted?</span></div>
+      <div><span class="v">${yearsSurvived} yrs</span><span class="l">Sustainment</span></div>
+    </div>
+    
+    <div class="swp-stepup-breakdown" style="margin-top: 16px; padding: 12px; background: var(--input-bg); border-radius: 12px;">
+      <h4 style="margin: 0 0 8px; color: var(--primary);">💡 Step-up SWP Analysis</h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; font-size: 14px;">
+        <div><span style="color: var(--text-secondary);">Initial Withdrawal Rate:</span> <strong>${fmtPct((initialWithdrawal/clampNum(document.getElementById('swp_stepup_corpus').value))*100)}</strong></div>
+        <div><span style="color: var(--text-secondary);">Expected Return:</span> <strong>${fmtPct(r*100)}</strong></div>
+        <div><span style="color: var(--text-secondary);">Yearly Increase:</span> <strong>${fmtPct(increaseRate*100)}</strong></div>
+        <div><span style="color: var(--text-secondary);">Average Withdrawal:</span> <strong>${fmtMoney(averageWithdrawal)}</strong></div>
+        <div><span style="color: var(--text-secondary);">Withdrawal Growth:</span> <strong>${fmtPct(((finalWithdrawal/initialWithdrawal - 1)*100))}</strong></div>
+        <div><span style="color: var(--text-secondary);">Sustainability:</span> <strong>${depletedEarly ? 'Limited' : 'Sustainable'}</strong></div>
+      </div>
+    </div>
+    
+    <div class="stepup-example" style="margin-top: 16px; padding: 12px; background: var(--warning-bg, #fff3e0); border-radius: 12px; border: 1px solid var(--warning, #ffb74d);">
+      <h4 style="margin: 0 0 8px; color: var(--warning-dark, #f57c00);">📈 Withdrawal Progression Example</h4>
+      <div style="font-size: 14px; color: #333; line-height: 1.5;">
+        <p style="margin: 0 0 8px;"><strong>Year 1:</strong> Withdraw ${fmtMoney(initialWithdrawal)}</p>
+        <p style="margin: 0 0 8px;"><strong>Year 5:</strong> Withdraw ${fmtMoney(initialWithdrawal * Math.pow(1 + increaseRate, 4))} (${fmtPct(increaseRate*100)} increase each year)</p>
+        <p style="margin: 0;"><strong>Year ${Math.min(10, yearsSurvived)}:</strong> Withdraw ${fmtMoney(initialWithdrawal * Math.pow(1 + increaseRate, Math.min(9, yearsSurvived-1)))} - Perfect for inflation protection!</p>
+      </div>
+    </div>`;
+  
+  if(depletedEarly){ 
+    showWarning("Corpus depleted before chosen tenure. Consider reducing initial withdrawal or increase rate.", "swp_stepup_result"); 
+  }
+  
+  document.getElementById('swp_stepup_schedule').innerHTML = buildTable(
+    ["Year","Start Balance","Growth","Withdrawal","End Balance","Increase Rate"], 
+    rows
+  );
+  
+  // Generate chart
+  const chartContainer = document.getElementById('swp_stepup_chart_container');
+  chartContainer.style.display = 'block';
+  
+  const chartLabels = [];
+  const balanceData = [];
+  const withdrawalData = [];
+  const withdrawalAmountData = [];
+  
+  let currentCorpus = clampNum(document.getElementById('swp_stepup_corpus').value);
+  let currentWithdrawalAmount = clampNum(document.getElementById('swp_stepup_withdraw').value);
+  let totalWithdrawn = 0;
+  
+  chartLabels.push('Start');
+  balanceData.push(currentCorpus);
+  withdrawalData.push(0);
+  withdrawalAmountData.push(currentWithdrawalAmount);
+  
+  for(let y = 1; y <= Math.min(years, yearsSurvived); y++){
+    const growth = currentCorpus * r;
+    currentCorpus = currentCorpus + growth - currentWithdrawalAmount;
+    totalWithdrawn += currentWithdrawalAmount;
+    
+    chartLabels.push(`Year ${y}`);
+    balanceData.push(Math.max(0, currentCorpus));
+    withdrawalData.push(totalWithdrawn);
+    
+    // Increase withdrawal for next year
+    currentWithdrawalAmount = currentWithdrawalAmount * (1 + increaseRate);
+    withdrawalAmountData.push(currentWithdrawalAmount);
+    
+    if(currentCorpus <= 0) break;
+  }
+  
+  createLineChart('swp_stepup_chart', chartLabels, [
+    { label: 'Remaining Corpus', data: balanceData },
+    { label: 'Total Withdrawn', data: withdrawalData }
+  ], 'SWP Step-up Yearly Corpus & Withdrawal Over Time');
+}
+
+function clearSWPStepup(){
+  // Reset to default values instead of clearing
+  document.getElementById('swp_stepup_corpus').value = '5000000';
+  document.getElementById('swp_stepup_withdraw').value = '400000';
+  document.getElementById('swp_stepup_increase').value = '6';
+  document.getElementById('swp_stepup_rate').value = '10';
+  document.getElementById('swp_stepup_years').value = '25';
+  // Clear results, charts, and schedules
+  document.getElementById('swp_stepup_result').innerHTML = '';
+  document.getElementById('swp_stepup_schedule').innerHTML = '';
+  const chartContainer = document.getElementById('swp_stepup_chart_container');
+  if(chartContainer) chartContainer.style.display = 'none';
+  destroyChart('swp_stepup_chart');
+}
+
 // ===== Clear Functions =====
 function clearFD(){
   // Reset to default values instead of clearing
@@ -1972,6 +2206,267 @@ function clearSuperSIP(){
   const chartContainer = document.getElementById('supersip_chart_container');
   if(chartContainer) chartContainer.style.display = 'none';
   destroyChart('supersip_chart');
+}
+
+// ===== Super SIP + Hold Strategy =====
+function calcSuperSIPHold(){
+  const startingSIP = clampNum(document.getElementById('supersiphold_amount').value);
+  const stepup = clampNum(document.getElementById('supersiphold_stepup').value)/100;
+  const sipYears = clampNum(document.getElementById('supersiphold_sip_years').value);
+  const holdYears = clampNum(document.getElementById('supersiphold_hold_years').value);
+  const annual = clampNum(document.getElementById('supersiphold_rate').value)/100;
+  const r = Math.pow(1 + annual, 1/12) - 1; // monthly rate
+  
+  const totalYears = sipYears + holdYears;
+  const sipMonths = Math.round(sipYears * 12);
+  
+  // ===== STEP-UP SIP + HOLD STRATEGY =====
+  let stepupSipBalance = 0;
+  let stepupTotalInvested = 0;
+  let currentSIP = startingSIP;
+  let stepupRows = [];
+  
+  // Phase 1: Step-up SIP Investment Phase
+  for(let y = 1; y <= sipYears; y++){
+    let yearStartBalance = stepupSipBalance;
+    let yearInvestment = 0;
+    
+    // Calculate monthly for this year with current SIP amount
+    for(let m = 1; m <= 12; m++){
+      const before = stepupSipBalance;
+      stepupSipBalance = stepupSipBalance * (1 + r) + currentSIP;
+      yearInvestment += currentSIP;
+      stepupTotalInvested += currentSIP;
+    }
+    
+    stepupRows.push([
+      `Year ${y}`,
+      fmtMoney(currentSIP),
+      fmtMoney(yearInvestment),
+      fmtMoney(stepupSipBalance - yearStartBalance - yearInvestment),
+      fmtMoney(stepupSipBalance),
+      "Step-up SIP Phase"
+    ]);
+    
+    // Increase SIP for next year
+    currentSIP = currentSIP * (1 + stepup);
+  }
+  
+  const stepupSipPhaseValue = stepupSipBalance;
+  
+  // Phase 2: Hold Phase (no new investments)
+  let stepupHoldBalance = stepupSipPhaseValue;
+  const holdMonths = Math.round(holdYears * 12);
+  
+  for(let y = 1; y <= holdYears; y++){
+    const yearStartBalance = stepupHoldBalance;
+    
+    // Calculate monthly growth for this year
+    for(let m = 1; m <= 12; m++){
+      stepupHoldBalance = stepupHoldBalance * (1 + r);
+    }
+    
+    stepupRows.push([
+      `Year ${sipYears + y}`,
+      "₹ 0",
+      "₹ 0",
+      fmtMoney(stepupHoldBalance - yearStartBalance),
+      fmtMoney(stepupHoldBalance),
+      "Hold Phase"
+    ]);
+  }
+  
+  const stepupFinalValue = stepupHoldBalance;
+  const stepupTotalGains = stepupFinalValue - stepupTotalInvested;
+  
+  // ===== REGULAR SIP + HOLD STRATEGY (for comparison) =====
+  let regularSipBalance = 0;
+  let regularTotalInvested = startingSIP * sipMonths;
+  let regularRows = [];
+  
+  // Phase 1: Regular SIP Investment Phase
+  for(let y = 1; y <= sipYears; y++){
+    let yearStartBalance = regularSipBalance;
+    let yearInvestment = startingSIP * 12;
+    
+    // Calculate monthly for this year with fixed SIP amount
+    for(let m = 1; m <= 12; m++){
+      const before = regularSipBalance;
+      regularSipBalance = regularSipBalance * (1 + r) + startingSIP;
+    }
+    
+    regularRows.push([
+      `Year ${y}`,
+      fmtMoney(startingSIP),
+      fmtMoney(yearInvestment),
+      fmtMoney(regularSipBalance - yearStartBalance - yearInvestment),
+      fmtMoney(regularSipBalance),
+      "Regular SIP Phase"
+    ]);
+  }
+  
+  const regularSipPhaseValue = regularSipBalance;
+  
+  // Phase 2: Hold Phase (no new investments)
+  let regularHoldBalance = regularSipPhaseValue;
+  
+  for(let y = 1; y <= holdYears; y++){
+    const yearStartBalance = regularHoldBalance;
+    
+    // Calculate monthly growth for this year
+    for(let m = 1; m <= 12; m++){
+      regularHoldBalance = regularHoldBalance * (1 + r);
+    }
+    
+    regularRows.push([
+      `Year ${sipYears + y}`,
+      "₹ 0",
+      "₹ 0",
+      fmtMoney(regularHoldBalance - yearStartBalance),
+      fmtMoney(regularHoldBalance),
+      "Hold Phase"
+    ]);
+  }
+  
+  const regularFinalValue = regularHoldBalance;
+  const regularTotalGains = regularFinalValue - regularTotalInvested;
+  
+  // Calculate advantage
+  const advantage = stepupFinalValue - regularFinalValue;
+  const advantagePct = ((stepupFinalValue / regularFinalValue) - 1) * 100;
+  const extraInvestment = stepupTotalInvested - regularTotalInvested;
+  
+  // Display results
+  document.getElementById('supersiphold_result').innerHTML = `
+    <div class="comparison-grid">
+      <div class="comparison-section">
+        <h3>🚀 Step-up SIP + Hold Strategy</h3>
+        <div class="kpi">
+          <div><span class="v">${fmtMoney(stepupTotalInvested)}</span><span class="l">Total Invested</span></div>
+          <div><span class="v">${fmtMoney(stepupSipPhaseValue)}</span><span class="l">Value after SIP Phase</span></div>
+          <div><span class="v">${fmtMoney(stepupFinalValue)}</span><span class="l">Final Maturity Value</span></div>
+          <div><span class="v">${fmtMoney(stepupTotalGains)}</span><span class="l">Total Gains</span></div>
+        </div>
+      </div>
+      
+      <div class="comparison-section">
+        <h3>📊 Regular SIP + Hold Strategy</h3>
+        <div class="kpi">
+          <div><span class="v">${fmtMoney(regularTotalInvested)}</span><span class="l">Total Invested</span></div>
+          <div><span class="v">${fmtMoney(regularSipPhaseValue)}</span><span class="l">Value after SIP Phase</span></div>
+          <div><span class="v">${fmtMoney(regularFinalValue)}</span><span class="l">Final Maturity Value</span></div>
+          <div><span class="v">${fmtMoney(regularTotalGains)}</span><span class="l">Total Gains</span></div>
+        </div>
+      </div>
+      
+      <div class="comparison-advantage">
+        <h3>🎯 Step-up Strategy Advantage</h3>
+        <div class="kpi">
+          <div><span class="v">${fmtMoney(advantage)}</span><span class="l">Extra Corpus</span></div>
+          <div><span class="v">${fmtPct(advantagePct)}</span><span class="l">% Better</span></div>
+          <div><span class="v">${fmtMoney(extraInvestment)}</span><span class="l">Extra Investment</span></div>
+          <div><span class="v">${totalYears} years</span><span class="l">Total Duration</span></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="strategy-breakdown" style="margin-top: 16px; padding: 12px; background: var(--input-bg); border-radius: 12px;">
+      <h4 style="margin: 0 0 8px; color: var(--primary);">💡 Super Strategy Breakdown</h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; font-size: 14px;">
+        <div><span style="color: var(--text-secondary);">Starting SIP:</span> <strong>${fmtMoney(startingSIP)}</strong></div>
+        <div><span style="color: var(--text-secondary);">Yearly Increase:</span> <strong>${fmtPct(stepup*100)}</strong></div>
+        <div><span style="color: var(--text-secondary);">SIP Duration:</span> <strong>${sipYears} years</strong></div>
+        <div><span style="color: var(--text-secondary);">Hold Duration:</span> <strong>${holdYears} years</strong></div>
+        <div><span style="color: var(--text-secondary);">Expected Return:</span> <strong>${fmtPct(annual*100)}</strong></div>
+        <div><span style="color: var(--text-secondary);">Final SIP Amount:</span> <strong>${fmtMoney(startingSIP * Math.pow(1 + stepup, sipYears - 1))}</strong></div>
+      </div>
+    </div>`;
+  
+  // Combined schedule showing both strategies
+  const headers = ["Period", "Monthly SIP", "Yearly Investment", "Yearly Interest", "Balance", "Phase"];
+  let combinedRows = [];
+  
+  // Add step-up strategy rows
+  combinedRows.push(["", "", "", "", "", ""]);
+  combinedRows.push(["STEP-UP SIP + HOLD STRATEGY", "", "", "", "", ""]);
+  combinedRows.push(["", "", "", "", "", ""]);
+  combinedRows = combinedRows.concat(stepupRows);
+  
+  // Add regular strategy rows
+  combinedRows.push(["", "", "", "", "", ""]);
+  combinedRows.push(["REGULAR SIP + HOLD STRATEGY", "", "", "", "", ""]);
+  combinedRows.push(["", "", "", "", "", ""]);
+  combinedRows = combinedRows.concat(regularRows);
+  
+  document.getElementById('supersiphold_schedule').innerHTML = buildTable(headers, combinedRows);
+  
+  // Generate chart
+  const chartContainer = document.getElementById('supersiphold_chart_container');
+  chartContainer.style.display = 'block';
+  
+  const chartLabels = [];
+  const stepupData = [];
+  const regularData = [];
+  
+  // Chart data for step-up strategy
+  let chartStepupBalance = 0;
+  let chartCurrentSIP = startingSIP;
+  
+  // Chart data for regular strategy
+  let chartRegularBalance = 0;
+  
+  // SIP Phase data
+  for(let y = 1; y <= sipYears; y++){
+    // Step-up SIP
+    for(let m = 1; m <= 12; m++){
+      chartStepupBalance = chartStepupBalance * (1 + r) + chartCurrentSIP;
+    }
+    
+    // Regular SIP
+    for(let m = 1; m <= 12; m++){
+      chartRegularBalance = chartRegularBalance * (1 + r) + startingSIP;
+    }
+    
+    chartLabels.push(`Year ${y}`);
+    stepupData.push(chartStepupBalance);
+    regularData.push(chartRegularBalance);
+    
+    // Increase SIP for next year (step-up only)
+    chartCurrentSIP = chartCurrentSIP * (1 + stepup);
+  }
+  
+  // Hold Phase data
+  for(let y = 1; y <= holdYears; y++){
+    // Both strategies just grow without new investments
+    for(let m = 1; m <= 12; m++){
+      chartStepupBalance = chartStepupBalance * (1 + r);
+      chartRegularBalance = chartRegularBalance * (1 + r);
+    }
+    
+    chartLabels.push(`Year ${sipYears + y}`);
+    stepupData.push(chartStepupBalance);
+    regularData.push(chartRegularBalance);
+  }
+  
+  createLineChart('supersiphold_chart', chartLabels, [
+    { label: 'Step-up SIP + Hold Value', data: stepupData },
+    { label: 'Regular SIP + Hold Value', data: regularData }
+  ], 'Super SIP + Hold Strategy Comparison');
+}
+
+function clearSuperSIPHold(){
+  // Reset to default values instead of clearing
+  document.getElementById('supersiphold_amount').value = '5000';
+  document.getElementById('supersiphold_stepup').value = '5';
+  document.getElementById('supersiphold_sip_years').value = '15';
+  document.getElementById('supersiphold_hold_years').value = '10';
+  document.getElementById('supersiphold_rate').value = '12';
+  // Clear results, charts, and schedules
+  document.getElementById('supersiphold_result').innerHTML = '';
+  document.getElementById('supersiphold_schedule').innerHTML = '';
+  const chartContainer = document.getElementById('supersiphold_chart_container');
+  if(chartContainer) chartContainer.style.display = 'none';
+  destroyChart('supersiphold_chart');
 }
 
 function clearEMI(){
@@ -2263,6 +2758,383 @@ function clearFutureValue(){
   // Clear results and schedules
   document.getElementById('future_value_result').innerHTML = '';
   document.getElementById('future_value_schedule').innerHTML = '';
+}
+
+// ===== Child Lifecycle Investment Calculator =====
+function calcChildLifecycle(){
+  const initialInvestment = clampNum(document.getElementById('childlifecycle_initial').value);
+  const annualReturn = clampNum(document.getElementById('childlifecycle_rate').value)/100;
+  const schoolFees = clampNum(document.getElementById('childlifecycle_school').value);
+  const collegeFees = clampNum(document.getElementById('childlifecycle_college').value);
+  const higherStudiesFees = clampNum(document.getElementById('childlifecycle_higher').value);
+  const marriageExpense = clampNum(document.getElementById('childlifecycle_marriage').value);
+  
+  let balance = initialInvestment;
+  let totalWithdrawals = 0;
+  let rows = [];
+  
+  // Years 1-4: Hold Period (no withdrawals)
+  for(let year = 1; year <= 4; year++){
+    const startBalance = balance;
+    const growth = balance * annualReturn;
+    balance = balance + growth;
+    
+    rows.push([
+      year,
+      fmtMoney(startBalance),
+      fmtMoney(growth),
+      "₹ 0",
+      fmtMoney(balance),
+      "Hold Period"
+    ]);
+  }
+  
+  // Years 5-17: School Education (13 years)
+  for(let year = 5; year <= 17; year++){
+    const startBalance = balance;
+    const growth = balance * annualReturn;
+    balance = balance + growth - schoolFees;
+    totalWithdrawals += schoolFees;
+    
+    rows.push([
+      year,
+      fmtMoney(startBalance),
+      fmtMoney(growth),
+      fmtMoney(schoolFees),
+      fmtMoney(Math.max(0, balance)),
+      "School Education"
+    ]);
+    
+    if(balance <= 0){
+      balance = 0;
+      break;
+    }
+  }
+  
+  // Years 18-21: College Education (4 years)
+  if(balance > 0){
+    for(let year = 18; year <= 21; year++){
+      const startBalance = balance;
+      const growth = balance * annualReturn;
+      balance = balance + growth - collegeFees;
+      totalWithdrawals += collegeFees;
+      
+      rows.push([
+        year,
+        fmtMoney(startBalance),
+        fmtMoney(growth),
+        fmtMoney(collegeFees),
+        fmtMoney(Math.max(0, balance)),
+        "College Education"
+      ]);
+      
+      if(balance <= 0){
+        balance = 0;
+        break;
+      }
+    }
+  }
+  
+  // Years 22-23: Higher Studies (2 years)
+  if(balance > 0){
+    for(let year = 22; year <= 23; year++){
+      const startBalance = balance;
+      const growth = balance * annualReturn;
+      balance = balance + growth - higherStudiesFees;
+      totalWithdrawals += higherStudiesFees;
+      
+      rows.push([
+        year,
+        fmtMoney(startBalance),
+        fmtMoney(growth),
+        fmtMoney(higherStudiesFees),
+        fmtMoney(Math.max(0, balance)),
+        "Higher Studies"
+      ]);
+      
+      if(balance <= 0){
+        balance = 0;
+        break;
+      }
+    }
+  }
+  
+  // Years 24-27: Growth period (no withdrawals)
+  if(balance > 0){
+    for(let year = 24; year <= 27; year++){
+      const startBalance = balance;
+      const growth = balance * annualReturn;
+      balance = balance + growth;
+      
+      rows.push([
+        year,
+        fmtMoney(startBalance),
+        fmtMoney(growth),
+        "₹ 0",
+        fmtMoney(balance),
+        "Growth Period"
+      ]);
+    }
+  }
+  
+  // Year 28: Marriage Expense
+  let marriageCorpus = 0;
+  if(balance > 0){
+    const startBalance = balance;
+    const growth = balance * annualReturn;
+    balance = balance + growth - marriageExpense;
+    totalWithdrawals += marriageExpense;
+    marriageCorpus = Math.max(0, balance);
+    
+    rows.push([
+      28,
+      fmtMoney(startBalance),
+      fmtMoney(growth),
+      fmtMoney(marriageExpense),
+      fmtMoney(marriageCorpus),
+      "Marriage Expense"
+    ]);
+  }
+  
+  // Years 29-58: 30-Year Hold Period After Marriage
+  let finalCorpusAt58 = marriageCorpus;
+  let holdPeriodRows = [];
+  if(marriageCorpus > 0){
+    for(let year = 29; year <= 58; year++){
+      const startBalance = finalCorpusAt58;
+      const growth = finalCorpusAt58 * annualReturn;
+      finalCorpusAt58 = finalCorpusAt58 + growth;
+      
+      // Add selected years to show progression
+      if(year === 30 || year === 35 || year === 40 || year === 45 || year === 50 || year === 55 || year === 58){
+        const holdYearsPassed = year - 28;
+        holdPeriodRows.push([
+          year,
+          fmtMoney(startBalance),
+          fmtMoney(growth),
+          "₹ 0",
+          fmtMoney(finalCorpusAt58),
+          `Hold Period (${holdYearsPassed} years post-marriage)`
+        ]);
+        rows.push([
+          year,
+          fmtMoney(startBalance),
+          fmtMoney(growth),
+          "₹ 0",
+          fmtMoney(finalCorpusAt58),
+          `Hold Period (${holdYearsPassed} years post-marriage)`
+        ]);
+      }
+    }
+  }
+  
+  const finalCorpus = Math.max(0, marriageCorpus); // Corpus at age 28
+  const finalCorpusAge58 = Math.max(0, finalCorpusAt58); // Corpus at age 58
+  const totalGrowth = finalCorpus + totalWithdrawals - initialInvestment;
+  const effectiveCAGR = initialInvestment > 0 ? ((Math.pow((finalCorpus + totalWithdrawals) / initialInvestment, 1/28) - 1) * 100) : 0;
+  const holdPeriodCAGR = marriageCorpus > 0 ? ((Math.pow(finalCorpusAge58 / marriageCorpus, 1/30) - 1) * 100) : 0;
+  
+  // Check if investment is sufficient
+  const isInsufficient = finalCorpus <= 0 && rows.length < 28;
+  
+  document.getElementById('childlifecycle_result').innerHTML = `
+    <div class="lifecycle-summary" style="background: var(--success-bg, #e8f5e8); border: 2px solid var(--success, #4caf50); border-radius: 16px; padding: 20px; margin: 16px 0;">
+      <h3 style="margin: 0 0 16px; color: var(--success-dark, #2e7d32); text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span>👶</span> Child's Financial Journey Results
+      </h3>
+      
+      <div class="journey-overview" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">
+        <div style="text-align: center; padding: 12px; background: var(--card); border-radius: 12px; border: 1px solid var(--success-light, #81c784);">
+          <div style="font-size: 20px; font-weight: bold; color: var(--success-dark, #2e7d32);">${fmtMoney(initialInvestment)}</div>
+          <div style="font-size: 14px; color: var(--text-secondary);">Initial Investment</div>
+          <div style="font-size: 12px; color: var(--text-muted);">At birth</div>
+        </div>
+        <div style="text-align: center; padding: 12px; background: var(--card); border-radius: 12px; border: 1px solid var(--success-light, #81c784);">
+          <div style="font-size: 20px; font-weight: bold; color: var(--primary);">${fmtMoney(totalWithdrawals)}</div>
+          <div style="font-size: 14px; color: var(--text-secondary);">Total Withdrawals</div>
+          <div style="font-size: 12px; color: var(--text-muted);">Over 28 years</div>
+        </div>
+        <div style="text-align: center; padding: 12px; background: var(--card); border-radius: 12px; border: 1px solid var(--success-light, #81c784);">
+          <div style="font-size: 20px; font-weight: bold; color: ${isInsufficient ? 'var(--danger, #dc3545)' : 'var(--warning-dark, #f57c00)'}">${fmtMoney(finalCorpus)}</div>
+          <div style="font-size: 14px; color: var(--text-secondary);">Corpus at Age 28</div>
+          <div style="font-size: 12px; color: var(--text-muted);">After marriage expense</div>
+        </div>
+        <div style="text-align: center; padding: 12px; background: var(--card); border-radius: 12px; border: 1px solid var(--success-light, #81c784);">
+          <div style="font-size: 20px; font-weight: bold; color: var(--success, #4caf50);">${fmtMoney(finalCorpusAge58)}</div>
+          <div style="font-size: 14px; color: var(--text-secondary);">🎯 Final Corpus at Age 58</div>
+          <div style="font-size: 12px; color: var(--text-muted);">After 30-year hold period</div>
+        </div>
+        <div style="text-align: center; padding: 12px; background: var(--card); border-radius: 12px; border: 1px solid var(--success-light, #81c784);">
+          <div style="font-size: 20px; font-weight: bold; color: ${isInsufficient ? 'var(--danger, #dc3545)' : 'var(--success, #4caf50)'}">${isInsufficient ? "Yes" : "No"}</div>
+          <div style="font-size: 14px; color: var(--text-secondary);">Depleted?</div>
+          <div style="font-size: 12px; color: var(--text-muted);">${isInsufficient ? "Funds exhausted" : "Funds sufficient"}</div>
+        </div>
+        <div style="text-align: center; padding: 12px; background: var(--card); border-radius: 12px; border: 1px solid var(--success-light, #81c784);">
+          <div style="font-size: 20px; font-weight: bold; color: var(--info-dark, #1565c0);">${fmtPct(effectiveCAGR)}</div>
+          <div style="font-size: 14px; color: var(--text-secondary);">Effective CAGR</div>
+          <div style="font-size: 12px; color: var(--text-muted);">Overall return</div>
+        </div>
+      </div>
+      
+      <div class="phase-breakdown" style="background: var(--warning-bg, #fff3e0); border-radius: 12px; padding: 12px; border: 1px solid var(--warning, #ffb74d);">
+        <h4 style="margin: 0 0 8px; color: var(--warning-dark, #f57c00); display: flex; align-items: center; gap: 8px;">
+          <span>📊</span> Phase-wise Breakdown
+        </h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 14px; color: #333;">
+          <div><span style="color: #666;">🏠 Hold Period (1-4 yrs):</span> <strong style="color: #000;">Growth Only</strong></div>
+          <div><span style="color: #666;">🎒 School (5-17 yrs):</span> <strong style="color: #000;">${fmtMoney(schoolFees * 13)}</strong></div>
+          <div><span style="color: #666;">🎓 College (18-21 yrs):</span> <strong style="color: #000;">${fmtMoney(collegeFees * 4)}</strong></div>
+          <div><span style="color: #666;">📚 Higher Studies (22-23 yrs):</span> <strong style="color: #000;">${fmtMoney(higherStudiesFees * 2)}</strong></div>
+          <div><span style="color: #666;">💒 Marriage (28 yrs):</span> <strong style="color: #000;">${fmtMoney(marriageExpense)}</strong></div>
+          <div><span style="color: #666;">💰 Remaining Corpus:</span> <strong style="color: #000;">${fmtMoney(finalCorpus)}</strong></div>
+        </div>
+      </div>
+    </div>
+    
+    ${isInsufficient ? `
+    <div class="insufficient-warning" style="background: var(--danger-bg, #ffebee); border: 2px solid var(--danger, #dc3545); border-radius: 12px; padding: 16px; margin: 16px 0;">
+      <h4 style="margin: 0 0 8px; color: var(--danger-dark, #c62828); display: flex; align-items: center; gap: 8px;">
+        <span>⚠️</span> Insufficient Investment Alert
+      </h4>
+      <div style="color: var(--danger-dark, #c62828); font-size: 14px; line-height: 1.5;">
+        <p style="margin: 0 0 8px;"><strong>The initial investment is not sufficient to cover all planned expenses.</strong></p>
+        <p style="margin: 0;">Consider increasing the initial investment or reducing some expense amounts to ensure your child's financial security.</p>
+      </div>
+    </div>
+    ` : ''}
+    
+    <div class="hold-period-highlight" style="background: linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 100%); border: 2px solid var(--success, #4caf50); border-radius: 16px; padding: 20px; margin: 16px 0;">
+      <h3 style="margin: 0 0 16px; color: var(--success-dark, #2e7d32); text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span>🎯</span> 30-Year Hold Period Results (Age 28-58)
+      </h3>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+        <div style="text-align: center; padding: 16px; background: var(--card); border-radius: 12px; border: 2px solid var(--warning, #ffb74d);">
+          <div style="font-size: 24px; font-weight: bold; color: var(--warning-dark, #f57c00);">${fmtMoney(finalCorpus)}</div>
+          <div style="font-size: 14px; color: var(--text-secondary); margin: 4px 0;">Starting Corpus</div>
+          <div style="font-size: 12px; color: var(--text-muted);">At age 28 (after marriage)</div>
+        </div>
+        <div style="text-align: center; padding: 16px; background: var(--card); border-radius: 12px; border: 2px solid var(--info, #2196f3);">
+          <div style="font-size: 24px; font-weight: bold; color: var(--info-dark, #1565c0);">${fmtPct(holdPeriodCAGR)}</div>
+          <div style="font-size: 14px; color: var(--text-secondary); margin: 4px 0;">Annual Growth</div>
+          <div style="font-size: 12px; color: var(--text-muted);">30-year CAGR</div>
+        </div>
+        <div style="text-align: center; padding: 16px; background: var(--card); border-radius: 12px; border: 2px solid var(--success, #4caf50);">
+          <div style="font-size: 24px; font-weight: bold; color: var(--success-dark, #2e7d32);">${fmtMoney(finalCorpusAge58)}</div>
+          <div style="font-size: 14px; color: var(--text-secondary); margin: 4px 0;">Final Corpus</div>
+          <div style="font-size: 12px; color: var(--text-muted);">At age 58</div>
+        </div>
+      </div>
+      
+      <div style="background: var(--warning-bg, #fff3e0); border-radius: 12px; padding: 16px; border: 1px solid var(--warning, #ffb74d);">
+        <h4 style="margin: 0 0 12px; color: var(--warning-dark, #f57c00); display: flex; align-items: center; gap: 8px;">
+          <span>💎</span> Power of 30-Year Compounding
+        </h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; font-size: 14px;">
+          <div><span style="color: #666;">💰 Growth Multiple:</span> <strong style="color: #000;">${finalCorpus > 0 ? (finalCorpusAge58 / finalCorpus).toFixed(1) : 0}x</strong></div>
+          <div><span style="color: #666;">📈 Additional Value:</span> <strong style="color: #000;">${fmtMoney(finalCorpusAge58 - finalCorpus)}</strong></div>
+          <div><span style="color: #666;">⏰ Hold Period:</span> <strong style="color: #000;">30 years (Age 28-58)</strong></div>
+          <div><span style="color: #666;">🎯 Strategy:</span> <strong style="color: #000;">No withdrawals, pure growth</strong></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="lifecycle-insights" style="background: var(--info-bg, #e3f2fd); border-radius: 12px; padding: 16px; margin: 16px 0; border: 1px solid var(--info, #90caf9);">
+      <h4 style="margin: 0 0 12px; color: var(--info-dark, #1565c0); display: flex; align-items: center; gap: 8px;">
+        <span>💡</span> Complete Investment Journey Summary
+      </h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; font-size: 14px;">
+        <div style="background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid var(--info-light, #bbdefb);">
+          <div style="font-weight: bold; color: var(--info-dark, #1565c0); margin-bottom: 4px;">💰 Total Value Generated (Age 0-28):</div>
+          <div style="color: var(--text);">Your ${fmtMoney(initialInvestment)} investment generated <strong>${fmtMoney(totalWithdrawals + finalCorpus)}</strong> total value over 28 years.</div>
+        </div>
+        <div style="background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid var(--info-light, #bbdefb);">
+          <div style="font-weight: bold; color: var(--info-dark, #1565c0); margin-bottom: 4px;">📈 28-Year Growth Multiple:</div>
+          <div style="color: var(--text);">Your investment grew <strong>${((totalWithdrawals + finalCorpus) / initialInvestment).toFixed(1)}x</strong> over the first 28-year period.</div>
+        </div>
+        ${finalCorpusAge58 > finalCorpus ? `
+        <div style="background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid var(--info-light, #bbdefb);">
+          <div style="font-weight: bold; color: var(--info-dark, #1565c0); margin-bottom: 4px;">🚀 30-Year Hold Growth (Age 28-58):</div>
+          <div style="color: var(--text);">The remaining ${fmtMoney(finalCorpus)} grows to <strong>${fmtMoney(finalCorpusAge58)}</strong> by age 58 at ${fmtPct(holdPeriodCAGR)} CAGR.</div>
+        </div>
+        <div style="background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid var(--info-light, #bbdefb);">
+          <div style="font-weight: bold; color: var(--info-dark, #1565c0); margin-bottom: 4px;">💎 Total Journey Value (Age 0-58):</div>
+          <div style="color: var(--text);">Complete journey value: <strong>${fmtMoney(totalWithdrawals + finalCorpusAge58)}</strong> from ${fmtMoney(initialInvestment)} initial investment!</div>
+        </div>
+        ` : ''}
+      </div>
+    </div>`;
+  
+  document.getElementById('childlifecycle_schedule').innerHTML = buildTable(
+    ["Year", "Start Balance", "Growth", "Withdrawal", "End Balance", "Phase"], 
+    rows
+  );
+  
+  // Generate chart
+  const chartContainer = document.getElementById('childlifecycle_chart_container');
+  chartContainer.style.display = 'block';
+  
+  const chartLabels = [];
+  const balanceData = [];
+  const withdrawalData = [];
+  
+  let currentBalance = initialInvestment;
+  let cumulativeWithdrawals = 0;
+  
+  chartLabels.push('Birth');
+  balanceData.push(initialInvestment);
+  withdrawalData.push(0);
+  
+  // Process each year for chart
+  for(let year = 1; year <= 28; year++){
+    const startBalance = currentBalance;
+    const growth = currentBalance * annualReturn;
+    currentBalance = currentBalance + growth;
+    
+    let withdrawal = 0;
+    if(year >= 5 && year <= 17){
+      withdrawal = schoolFees;
+    } else if(year >= 18 && year <= 21){
+      withdrawal = collegeFees;
+    } else if(year >= 22 && year <= 23){
+      withdrawal = higherStudiesFees;
+    } else if(year === 28){
+      withdrawal = marriageExpense;
+    }
+    
+    currentBalance = Math.max(0, currentBalance - withdrawal);
+    cumulativeWithdrawals += withdrawal;
+    
+    // Add data points for key years
+    if(year === 4 || year === 17 || year === 21 || year === 23 || year === 28 || year % 5 === 0){
+      chartLabels.push(`Age ${year}`);
+      balanceData.push(currentBalance);
+      withdrawalData.push(cumulativeWithdrawals);
+    }
+    
+    if(currentBalance <= 0 && withdrawal > 0) break;
+  }
+  
+  createLineChart('childlifecycle_chart', chartLabels, [
+    { label: 'Investment Balance', data: balanceData },
+    { label: 'Total Withdrawals', data: withdrawalData }
+  ], 'Child Lifecycle Investment Journey');
+}
+
+function clearChildLifecycle(){
+  // Reset to default values instead of clearing
+  document.getElementById('childlifecycle_initial').value = '1000000';
+  document.getElementById('childlifecycle_rate').value = '13';
+  document.getElementById('childlifecycle_school').value = '100000';
+  document.getElementById('childlifecycle_college').value = '500000';
+  document.getElementById('childlifecycle_higher').value = '1000000';
+  document.getElementById('childlifecycle_marriage').value = '5000000';
+  // Clear results, charts, and schedules
+  document.getElementById('childlifecycle_result').innerHTML = '';
+  document.getElementById('childlifecycle_schedule').innerHTML = '';
+  const chartContainer = document.getElementById('childlifecycle_chart_container');
+  if(chartContainer) chartContainer.style.display = 'none';
+  destroyChart('childlifecycle_chart');
 }
 
 // APPLY_SAVED_THEME
